@@ -5,7 +5,7 @@
 
 [functions]
   node_bundler = "nft"
-  included_files = ["server/**"]
+  included_files = ["server/**", "node_modules/sql.js/dist/sql-wasm.wasm"]
 
 [build.environment]
   NODE_VERSION = "20"
