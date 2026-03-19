@@ -3,12 +3,8 @@
 
 const bcrypt = require('bcryptjs');
 
-module.exports = function seedDatabase() {
-  const db = require('./db');
-
-  // Check if already seeded
-  const adminExists = db.prepare('SELECT id FROM admins LIMIT 1').get();
-  if (adminExists) return;
+module.exports = function seedDatabase(db) {
+  if (!db) db = require('./db');
 
   // 1. Admin
   const passwordHash = bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'admin123', 10);

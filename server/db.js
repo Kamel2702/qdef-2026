@@ -144,10 +144,10 @@ if (isNetlify) {
   const adminExists = db.prepare('SELECT id FROM admins LIMIT 1').get();
   if (!adminExists) {
     try {
-      require('./seed-fn')();
-      db._save();
+      require('./seed-fn')(db);
+      if (db._save) db._save();
       console.log('Auto-seeded on cold start');
-    } catch (e) { console.warn('Seed failed:', e.message); }
+    } catch (e) { console.warn('Seed failed:', e.message, e.stack); }
   }
 }
 
