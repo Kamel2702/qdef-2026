@@ -1,11 +1,14 @@
 [build]
-  command = "cd client && npx vite build && cd ../server && npm install"
+  command = "cd client && npm install && npx vite build && cd .. && npm install && cd server && rm -rf node_modules && npm install"
   publish = "client/dist"
   functions = "netlify/functions"
 
 [functions]
   node_bundler = "nft"
   included_files = ["server/**"]
+
+[build.environment]
+  NODE_VERSION = "20"
 
 [[redirects]]
   from = "/api/*"
