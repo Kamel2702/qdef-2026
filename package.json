@@ -1,0 +1,17 @@
+{
+  "name": "qdef-conference",
+  "version": "1.0.0",
+  "description": "Q-DEF Conference Luxembourg - Event Website",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && node index.js",
+    "dev:client": "cd client && npx vite",
+    "build": "cd client && npx vite build",
+    "seed": "cd server && node seed.js",
+    "start": "cd server && node index.js"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

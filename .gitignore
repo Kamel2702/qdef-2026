@@ -1,0 +1,9 @@
+node_modules/
+.env
+*.db
+client/dist/
+.netlify/
+uploads/
+.agents/
+skills-lock.json
+.claude/
