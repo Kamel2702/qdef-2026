@@ -62,10 +62,12 @@ app.get('*', (req, res) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Q-DEF Conference server running on http://localhost:${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+// Only start server when run directly (not in serverless)
+if (!process.env.NETLIFY) {
+  app.listen(PORT, () => {
+    console.log(`Q-DEF Conference server running on http://localhost:${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
 
 module.exports = app;

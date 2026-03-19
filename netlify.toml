@@ -1,11 +1,15 @@
 [build]
-  base = "client"
-  command = "npx vite build"
-  publish = "dist"
+  command = "cd client && npx vite build && cd ../server && npm install"
+  publish = "client/dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "nft"
+  included_files = ["server/**"]
 
 [[redirects]]
   from = "/api/*"
-  to = "http://localhost:4000/api/:splat"
+  to = "/.netlify/functions/api/api/:splat"
   status = 200
   force = true
 

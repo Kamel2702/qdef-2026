@@ -1,7 +1,14 @@
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 
-const dbPath = path.join(__dirname, 'qdef.db');
+// In Netlify Functions, use /tmp for writable storage
+const isNetlify = !!process.env.NETLIFY;
+const dbPath = isNetlify ? '/tmp/qdef.db' : path.join(__dirname, 'qdef.db');
+
+// Check if DB needs seeding (for serverless cold starts)
+const needsSeed = isNetlify && !fs.existsSync(dbPath);
+
 const db = new Database(dbPath);
 
 // Enable WAL mode for better concurrent read performance
@@ -126,5 +133,15 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 `);
+
+// Auto-seed on Netlify cold start
+if (needsSeed) {
+  try {
+    require('./seed-fn')();
+    console.log('Database auto-seeded on cold start');
+  } catch (err) {
+    console.warn('Auto-seed failed:', err.message);
+  }
+}
 
 module.exports = db;
