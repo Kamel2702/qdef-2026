@@ -2324,6 +2324,40 @@ button {
   padding: var(--space-xl);
 }
 
+/* Fix form inputs for light theme in admin & modals */
+.admin-content .form-input,
+.admin-content .form-select,
+.admin-content .form-textarea,
+.modal .form-input,
+.modal .form-select,
+.modal .form-textarea {
+  background: #fff;
+  border: 1.5px solid var(--color-gray-200);
+  color: var(--color-gray-900);
+}
+
+.admin-content .form-input:focus,
+.admin-content .form-select:focus,
+.admin-content .form-textarea:focus,
+.modal .form-input:focus,
+.modal .form-select:focus,
+.modal .form-textarea:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+}
+
+.admin-content .form-input::placeholder,
+.admin-content .form-textarea::placeholder,
+.modal .form-input::placeholder,
+.modal .form-textarea::placeholder {
+  color: var(--color-gray-400);
+}
+
+.admin-content .form-label,
+.modal .form-label {
+  color: var(--color-gray-700);
+}
+
 .modal__footer {
   display: flex;
   justify-content: flex-end;
@@ -2422,9 +2456,32 @@ button {
 
 .login-card .login-subtitle {
   text-align: center;
-  color: var(--color-gray-400);
+  color: var(--color-gray-500);
   font-size: 0.9rem;
   margin-bottom: var(--space-2xl);
+}
+
+.login-card .form-input {
+  background: #fff;
+  border: 1.5px solid var(--color-gray-200);
+  color: var(--color-gray-900);
+}
+
+.login-card .form-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+}
+
+.login-card .form-input::placeholder {
+  color: var(--color-gray-400);
+}
+
+.login-card .form-label {
+  color: var(--color-gray-700);
+}
+
+.login-card h1 {
+  color: var(--color-gray-900);
 }
 
 /* ============================================================
