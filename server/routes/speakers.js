@@ -1,13 +1,19 @@
 const express = require('express');
-const db = require('../db');
+const supabase = require('../supabase');
 const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
 // GET /api/speakers - list all speakers (public)
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const speakers = db.prepare('SELECT * FROM speakers ORDER BY name ASC').all();
+    const { data: speakers, error } = await supabase
+      .from('speakers')
+      .select('*')
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+
     res.json(speakers);
   } catch (err) {
     console.error('List speakers error:', err);
@@ -16,16 +22,26 @@ router.get('/', (req, res) => {
 });
 
 // GET /api/speakers/:id - get single speaker (public)
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const speaker = db.prepare('SELECT * FROM speakers WHERE id = ?').get(req.params.id);
+    const { data: speaker, error } = await supabase
+      .from('speakers')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
 
-    if (!speaker) {
+    if (error || !speaker) {
       return res.status(404).json({ error: 'Speaker not found.' });
     }
 
     // Also fetch sessions this speaker is part of
-    const sessions = db.prepare('SELECT * FROM sessions ORDER BY start_time ASC').all();
+    const { data: sessions, error: sessionsError } = await supabase
+      .from('sessions')
+      .select('*')
+      .order('start_time', { ascending: true });
+
+    if (sessionsError) throw sessionsError;
+
     speaker.sessions = sessions.filter(session => {
       const speakerIds = JSON.parse(session.speaker_ids || '[]');
       return speakerIds.includes(speaker.id);
@@ -42,7 +58,7 @@ router.get('/:id', (req, res) => {
 });
 
 // POST /api/speakers - create speaker (admin)
-router.post('/', authMiddleware, (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
     const { name, title, organization, bio, photo_url } = req.body;
 
@@ -50,12 +66,19 @@ router.post('/', authMiddleware, (req, res) => {
       return res.status(400).json({ error: 'Name is required.' });
     }
 
-    const result = db.prepare(`
-      INSERT INTO speakers (name, title, organization, bio, photo_url)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(name, title || null, organization || null, bio || null, photo_url || null);
+    const { data: speaker, error } = await supabase
+      .from('speakers')
+      .insert({
+        name,
+        title: title || null,
+        organization: organization || null,
+        bio: bio || null,
+        photo_url: photo_url || null
+      })
+      .select()
+      .single();
 
-    const speaker = db.prepare('SELECT * FROM speakers WHERE id = ?').get(result.lastInsertRowid);
+    if (error) throw error;
 
     res.status(201).json(speaker);
   } catch (err) {
@@ -65,30 +88,34 @@ router.post('/', authMiddleware, (req, res) => {
 });
 
 // PUT /api/speakers/:id - update speaker (admin)
-router.put('/:id', authMiddleware, (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
   try {
-    const existing = db.prepare('SELECT * FROM speakers WHERE id = ?').get(req.params.id);
+    const { data: existing, error: fetchError } = await supabase
+      .from('speakers')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
 
-    if (!existing) {
+    if (fetchError || !existing) {
       return res.status(404).json({ error: 'Speaker not found.' });
     }
 
     const { name, title, organization, bio, photo_url } = req.body;
 
-    db.prepare(`
-      UPDATE speakers
-      SET name = ?, title = ?, organization = ?, bio = ?, photo_url = ?
-      WHERE id = ?
-    `).run(
-      name || existing.name,
-      title !== undefined ? title : existing.title,
-      organization !== undefined ? organization : existing.organization,
-      bio !== undefined ? bio : existing.bio,
-      photo_url !== undefined ? photo_url : existing.photo_url,
-      req.params.id
-    );
+    const { data: speaker, error } = await supabase
+      .from('speakers')
+      .update({
+        name: name || existing.name,
+        title: title !== undefined ? title : existing.title,
+        organization: organization !== undefined ? organization : existing.organization,
+        bio: bio !== undefined ? bio : existing.bio,
+        photo_url: photo_url !== undefined ? photo_url : existing.photo_url
+      })
+      .eq('id', req.params.id)
+      .select()
+      .single();
 
-    const speaker = db.prepare('SELECT * FROM speakers WHERE id = ?').get(req.params.id);
+    if (error) throw error;
 
     res.json(speaker);
   } catch (err) {
@@ -98,15 +125,24 @@ router.put('/:id', authMiddleware, (req, res) => {
 });
 
 // DELETE /api/speakers/:id - delete speaker (admin)
-router.delete('/:id', authMiddleware, (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const existing = db.prepare('SELECT * FROM speakers WHERE id = ?').get(req.params.id);
+    const { data: existing, error: fetchError } = await supabase
+      .from('speakers')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
 
-    if (!existing) {
+    if (fetchError || !existing) {
       return res.status(404).json({ error: 'Speaker not found.' });
     }
 
-    db.prepare('DELETE FROM speakers WHERE id = ?').run(req.params.id);
+    const { error } = await supabase
+      .from('speakers')
+      .delete()
+      .eq('id', req.params.id);
+
+    if (error) throw error;
 
     res.json({ message: 'Speaker deleted successfully.' });
   } catch (err) {

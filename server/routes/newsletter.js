@@ -1,11 +1,11 @@
 const express = require('express');
-const db = require('../db');
+const supabase = require('../supabase');
 const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
 // POST /api/newsletter - subscribe (public)
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const email = (req.body.email || '').trim().toLowerCase();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -13,13 +13,23 @@ router.post('/', (req, res) => {
       return res.status(400).json({ error: 'Valid email is required.' });
     }
 
-    const existing = db.prepare('SELECT id FROM newsletter WHERE email = ?').get(email);
+    const { data: existing } = await supabase
+      .from('newsletter')
+      .select('id')
+      .eq('email', email)
+      .single();
+
     if (existing) {
       return res.json({ message: 'Already subscribed.' });
     }
 
     const source = req.body.source || 'website';
-    db.prepare('INSERT INTO newsletter (email, source) VALUES (?, ?)').run(email, source);
+
+    const { error } = await supabase
+      .from('newsletter')
+      .insert({ email, source });
+
+    if (error) throw error;
 
     res.status(201).json({ message: 'Subscribed successfully.' });
   } catch (err) {
@@ -29,9 +39,15 @@ router.post('/', (req, res) => {
 });
 
 // GET /api/newsletter - list subscribers (admin)
-router.get('/', authMiddleware, (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
-    const subscribers = db.prepare('SELECT * FROM newsletter ORDER BY created_at DESC').all();
+    const { data: subscribers, error } = await supabase
+      .from('newsletter')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
     res.json(subscribers);
   } catch (err) {
     console.error('List newsletter error:', err);
@@ -40,9 +56,14 @@ router.get('/', authMiddleware, (req, res) => {
 });
 
 // GET /api/newsletter/export - export as CSV (admin)
-router.get('/export', authMiddleware, (req, res) => {
+router.get('/export', authMiddleware, async (req, res) => {
   try {
-    const subscribers = db.prepare('SELECT * FROM newsletter ORDER BY created_at DESC').all();
+    const { data: subscribers, error } = await supabase
+      .from('newsletter')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
 
     const headers = ['ID', 'Email', 'Source', 'Subscribed At'];
     const csvRows = [headers.join(',')];
@@ -67,12 +88,23 @@ router.get('/export', authMiddleware, (req, res) => {
 });
 
 // DELETE /api/newsletter/:id - unsubscribe (admin)
-router.delete('/:id', authMiddleware, (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const existing = db.prepare('SELECT * FROM newsletter WHERE id = ?').get(req.params.id);
-    if (!existing) return res.status(404).json({ error: 'Subscriber not found.' });
+    const { data: existing, error: fetchError } = await supabase
+      .from('newsletter')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
 
-    db.prepare('DELETE FROM newsletter WHERE id = ?').run(req.params.id);
+    if (fetchError || !existing) return res.status(404).json({ error: 'Subscriber not found.' });
+
+    const { error } = await supabase
+      .from('newsletter')
+      .delete()
+      .eq('id', req.params.id);
+
+    if (error) throw error;
+
     res.json({ message: 'Subscriber removed.' });
   } catch (err) {
     console.error('Delete subscriber error:', err);

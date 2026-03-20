@@ -1,6 +1,6 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
-const db = require('../db');
+const supabase = require('../supabase');
 const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
@@ -47,7 +47,7 @@ async function sendConfirmationEmail(registration) {
 }
 
 // POST /api/register - public registration
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const {
       first_name, last_name, organization, position,
@@ -72,23 +72,33 @@ router.post('/', (req, res) => {
     }
 
     // Check duplicate email
-    const existing = db.prepare('SELECT id FROM registrations WHERE email = ?').get(email);
+    const { data: existing } = await supabase
+      .from('registrations')
+      .select('id')
+      .eq('email', email)
+      .single();
+
     if (existing) {
       return res.status(409).json({ error: 'This email address is already registered.' });
     }
 
-    const result = db.prepare(`
-      INSERT INTO registrations (first_name, last_name, organization, position, email, country, dietary_requirements, accessibility_needs, gdpr_consent)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      first_name, last_name,
-      organization || null, position || null,
-      email, country || null,
-      dietary_requirements || null, accessibility_needs || null,
-      gdpr_consent ? 1 : 0
-    );
+    const { data: registration, error } = await supabase
+      .from('registrations')
+      .insert({
+        first_name,
+        last_name,
+        organization: organization || null,
+        position: position || null,
+        email,
+        country: country || null,
+        dietary_requirements: dietary_requirements || null,
+        accessibility_needs: accessibility_needs || null,
+        gdpr_consent: gdpr_consent ? 1 : 0
+      })
+      .select()
+      .single();
 
-    const registration = db.prepare('SELECT * FROM registrations WHERE id = ?').get(result.lastInsertRowid);
+    if (error) throw error;
 
     // Send confirmation email in the background (don't await / don't block response)
     sendConfirmationEmail(registration);
@@ -104,9 +114,15 @@ router.post('/', (req, res) => {
 });
 
 // GET /api/registrations - list all registrations (admin)
-router.get('/', authMiddleware, (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
-    const registrations = db.prepare('SELECT * FROM registrations ORDER BY created_at DESC').all();
+    const { data: registrations, error } = await supabase
+      .from('registrations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
     res.json(registrations);
   } catch (err) {
     console.error('List registrations error:', err);
@@ -115,9 +131,14 @@ router.get('/', authMiddleware, (req, res) => {
 });
 
 // GET /api/registrations/export - export as CSV (admin)
-router.get('/export', authMiddleware, (req, res) => {
+router.get('/export', authMiddleware, async (req, res) => {
   try {
-    const registrations = db.prepare('SELECT * FROM registrations ORDER BY created_at DESC').all();
+    const { data: registrations, error } = await supabase
+      .from('registrations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
 
     const headers = [
       'ID', 'First Name', 'Last Name', 'Organization', 'Position',
@@ -156,16 +177,51 @@ router.get('/export', authMiddleware, (req, res) => {
 });
 
 // GET /api/registrations/stats - get count stats (admin)
-router.get('/stats', authMiddleware, (req, res) => {
+router.get('/stats', authMiddleware, async (req, res) => {
   try {
-    const total = db.prepare('SELECT COUNT(*) as count FROM registrations').get();
-    const byCountry = db.prepare('SELECT country, COUNT(*) as count FROM registrations WHERE country IS NOT NULL GROUP BY country ORDER BY count DESC').all();
-    const byOrganization = db.prepare('SELECT organization, COUNT(*) as count FROM registrations WHERE organization IS NOT NULL GROUP BY organization ORDER BY count DESC').all();
-    const recent = db.prepare("SELECT COUNT(*) as count FROM registrations WHERE created_at >= datetime('now', '-7 days')").get();
+    // Total count
+    const { count: total, error: totalError } = await supabase
+      .from('registrations')
+      .select('*', { count: 'exact', head: true });
+
+    if (totalError) throw totalError;
+
+    // All registrations for grouping
+    const { data: allRegs, error: allError } = await supabase
+      .from('registrations')
+      .select('country, organization, created_at');
+
+    if (allError) throw allError;
+
+    // Recent registrations (last 7 days)
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const recentCount = allRegs.filter(r => r.created_at && r.created_at >= sevenDaysAgo).length;
+
+    // Group by country
+    const countryMap = {};
+    for (const reg of allRegs) {
+      if (reg.country) {
+        countryMap[reg.country] = (countryMap[reg.country] || 0) + 1;
+      }
+    }
+    const byCountry = Object.entries(countryMap)
+      .map(([country, count]) => ({ country, count }))
+      .sort((a, b) => b.count - a.count);
+
+    // Group by organization
+    const orgMap = {};
+    for (const reg of allRegs) {
+      if (reg.organization) {
+        orgMap[reg.organization] = (orgMap[reg.organization] || 0) + 1;
+      }
+    }
+    const byOrganization = Object.entries(orgMap)
+      .map(([organization, count]) => ({ organization, count }))
+      .sort((a, b) => b.count - a.count);
 
     res.json({
-      total: total.count,
-      recent_week: recent.count,
+      total,
+      recent_week: recentCount,
       by_country: byCountry,
       by_organization: byOrganization
     });
@@ -176,15 +232,24 @@ router.get('/stats', authMiddleware, (req, res) => {
 });
 
 // DELETE /api/registrations/:id - delete registration (admin)
-router.delete('/:id', authMiddleware, (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const existing = db.prepare('SELECT * FROM registrations WHERE id = ?').get(req.params.id);
+    const { data: existing, error: fetchError } = await supabase
+      .from('registrations')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
 
-    if (!existing) {
+    if (fetchError || !existing) {
       return res.status(404).json({ error: 'Registration not found.' });
     }
 
-    db.prepare('DELETE FROM registrations WHERE id = ?').run(req.params.id);
+    const { error } = await supabase
+      .from('registrations')
+      .delete()
+      .eq('id', req.params.id);
+
+    if (error) throw error;
 
     res.json({ message: 'Registration deleted successfully.' });
   } catch (err) {

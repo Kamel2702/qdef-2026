@@ -1,15 +1,19 @@
 const express = require('express');
-const db = require('../db');
+const supabase = require('../supabase');
 const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
 // GET /api/pages/:slug - get page content (public)
-router.get('/:slug', (req, res) => {
+router.get('/:slug', async (req, res) => {
   try {
-    const page = db.prepare('SELECT * FROM pages WHERE slug = ?').get(req.params.slug);
+    const { data: page, error } = await supabase
+      .from('pages')
+      .select('*')
+      .eq('slug', req.params.slug)
+      .single();
 
-    if (!page) {
+    if (error || !page) {
       return res.status(404).json({ error: 'Page not found.' });
     }
 
@@ -21,31 +25,49 @@ router.get('/:slug', (req, res) => {
 });
 
 // PUT /api/pages/:slug - update page content (admin)
-router.put('/:slug', authMiddleware, (req, res) => {
+router.put('/:slug', authMiddleware, async (req, res) => {
   try {
     const { title, content } = req.body;
 
-    const existing = db.prepare('SELECT * FROM pages WHERE slug = ?').get(req.params.slug);
+    const { data: existing } = await supabase
+      .from('pages')
+      .select('*')
+      .eq('slug', req.params.slug)
+      .single();
 
     if (existing) {
       // Update existing page
-      db.prepare(`
-        UPDATE pages SET title = ?, content = ?, updated_at = CURRENT_TIMESTAMP
-        WHERE slug = ?
-      `).run(
-        title !== undefined ? title : existing.title,
-        content !== undefined ? content : existing.content,
-        req.params.slug
-      );
+      const { error: updateError } = await supabase
+        .from('pages')
+        .update({
+          title: title !== undefined ? title : existing.title,
+          content: content !== undefined ? content : existing.content,
+          updated_at: new Date().toISOString()
+        })
+        .eq('slug', req.params.slug);
+
+      if (updateError) throw updateError;
     } else {
       // Create new page with this slug
-      db.prepare(`
-        INSERT INTO pages (slug, title, content, updated_at)
-        VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-      `).run(req.params.slug, title || req.params.slug, content || '');
+      const { error: insertError } = await supabase
+        .from('pages')
+        .insert({
+          slug: req.params.slug,
+          title: title || req.params.slug,
+          content: content || '',
+          updated_at: new Date().toISOString()
+        });
+
+      if (insertError) throw insertError;
     }
 
-    const page = db.prepare('SELECT * FROM pages WHERE slug = ?').get(req.params.slug);
+    const { data: page, error } = await supabase
+      .from('pages')
+      .select('*')
+      .eq('slug', req.params.slug)
+      .single();
+
+    if (error) throw error;
 
     res.json(page);
   } catch (err) {

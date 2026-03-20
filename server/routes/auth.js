@@ -1,13 +1,13 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const db = require('../db');
+const supabase = require('../supabase');
 const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
 // POST /api/auth/login
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -15,9 +15,13 @@ router.post('/login', (req, res) => {
       return res.status(400).json({ error: 'Email and password are required.' });
     }
 
-    const admin = db.prepare('SELECT * FROM admins WHERE email = ?').get(email);
+    const { data: admin, error } = await supabase
+      .from('admins')
+      .select('*')
+      .eq('email', email)
+      .single();
 
-    if (!admin) {
+    if (error || !admin) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
@@ -48,11 +52,15 @@ router.post('/login', (req, res) => {
 });
 
 // GET /api/auth/me
-router.get('/me', authMiddleware, (req, res) => {
+router.get('/me', authMiddleware, async (req, res) => {
   try {
-    const admin = db.prepare('SELECT id, email, name, created_at FROM admins WHERE id = ?').get(req.admin.id);
+    const { data: admin, error } = await supabase
+      .from('admins')
+      .select('id, email, name, created_at')
+      .eq('id', req.admin.id)
+      .single();
 
-    if (!admin) {
+    if (error || !admin) {
       return res.status(404).json({ error: 'Admin not found.' });
     }
 

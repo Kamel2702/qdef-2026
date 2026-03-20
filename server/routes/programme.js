@@ -1,15 +1,25 @@
 const express = require('express');
-const db = require('../db');
+const supabase = require('../supabase');
 const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
 // GET /api/sessions - list all sessions (public)
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const sessions = db.prepare('SELECT * FROM sessions ORDER BY start_time ASC').all();
+    const { data: sessions, error } = await supabase
+      .from('sessions')
+      .select('*')
+      .order('start_time', { ascending: true });
 
-    const allSpeakers = db.prepare('SELECT id, name, title, organization, photo_url FROM speakers').all();
+    if (error) throw error;
+
+    const { data: allSpeakers, error: speakersError } = await supabase
+      .from('speakers')
+      .select('id, name, title, organization, photo_url');
+
+    if (speakersError) throw speakersError;
+
     const speakerMap = {};
     allSpeakers.forEach(s => { speakerMap[s.id] = s; });
 
@@ -31,11 +41,15 @@ router.get('/', (req, res) => {
 });
 
 // GET /api/sessions/:id - get single session (public)
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const session = db.prepare('SELECT * FROM sessions WHERE id = ?').get(req.params.id);
+    const { data: session, error } = await supabase
+      .from('sessions')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
 
-    if (!session) {
+    if (error || !session) {
       return res.status(404).json({ error: 'Session not found.' });
     }
 
@@ -43,8 +57,12 @@ router.get('/:id', (req, res) => {
 
     // Also fetch the speaker details for this session
     if (session.speaker_ids.length > 0) {
-      const placeholders = session.speaker_ids.map(() => '?').join(',');
-      const speakers = db.prepare(`SELECT * FROM speakers WHERE id IN (${placeholders})`).all(...session.speaker_ids);
+      const { data: speakers, error: speakersError } = await supabase
+        .from('speakers')
+        .select('*')
+        .in('id', session.speaker_ids);
+
+      if (speakersError) throw speakersError;
       session.speakers = speakers;
     } else {
       session.speakers = [];
@@ -58,7 +76,7 @@ router.get('/:id', (req, res) => {
 });
 
 // POST /api/sessions - create session (admin)
-router.post('/', authMiddleware, (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
     const { title, description, type, start_time, end_time, speaker_ids, tags, location } = req.body;
 
@@ -73,12 +91,23 @@ router.post('/', authMiddleware, (req, res) => {
 
     const speakerIdsJson = JSON.stringify(speaker_ids || []);
 
-    const result = db.prepare(`
-      INSERT INTO sessions (title, description, type, start_time, end_time, speaker_ids, tags, location)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(title, description || null, type, start_time, end_time, speakerIdsJson, tags || null, location || null);
+    const { data: session, error } = await supabase
+      .from('sessions')
+      .insert({
+        title,
+        description: description || null,
+        type,
+        start_time,
+        end_time,
+        speaker_ids: speakerIdsJson,
+        tags: tags || null,
+        location: location || null
+      })
+      .select()
+      .single();
 
-    const session = db.prepare('SELECT * FROM sessions WHERE id = ?').get(result.lastInsertRowid);
+    if (error) throw error;
+
     session.speaker_ids = JSON.parse(session.speaker_ids || '[]');
 
     res.status(201).json(session);
@@ -89,11 +118,15 @@ router.post('/', authMiddleware, (req, res) => {
 });
 
 // PUT /api/sessions/:id - update session (admin)
-router.put('/:id', authMiddleware, (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
   try {
-    const existing = db.prepare('SELECT * FROM sessions WHERE id = ?').get(req.params.id);
+    const { data: existing, error: fetchError } = await supabase
+      .from('sessions')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
 
-    if (!existing) {
+    if (fetchError || !existing) {
       return res.status(404).json({ error: 'Session not found.' });
     }
 
@@ -108,23 +141,24 @@ router.put('/:id', authMiddleware, (req, res) => {
 
     const speakerIdsJson = speaker_ids !== undefined ? JSON.stringify(speaker_ids) : existing.speaker_ids;
 
-    db.prepare(`
-      UPDATE sessions
-      SET title = ?, description = ?, type = ?, start_time = ?, end_time = ?, speaker_ids = ?, tags = ?, location = ?
-      WHERE id = ?
-    `).run(
-      title || existing.title,
-      description !== undefined ? description : existing.description,
-      type || existing.type,
-      start_time || existing.start_time,
-      end_time || existing.end_time,
-      speakerIdsJson,
-      tags !== undefined ? tags : existing.tags,
-      location !== undefined ? location : existing.location,
-      req.params.id
-    );
+    const { data: session, error } = await supabase
+      .from('sessions')
+      .update({
+        title: title || existing.title,
+        description: description !== undefined ? description : existing.description,
+        type: type || existing.type,
+        start_time: start_time || existing.start_time,
+        end_time: end_time || existing.end_time,
+        speaker_ids: speakerIdsJson,
+        tags: tags !== undefined ? tags : existing.tags,
+        location: location !== undefined ? location : existing.location
+      })
+      .eq('id', req.params.id)
+      .select()
+      .single();
 
-    const session = db.prepare('SELECT * FROM sessions WHERE id = ?').get(req.params.id);
+    if (error) throw error;
+
     session.speaker_ids = JSON.parse(session.speaker_ids || '[]');
 
     res.json(session);
@@ -135,15 +169,24 @@ router.put('/:id', authMiddleware, (req, res) => {
 });
 
 // DELETE /api/sessions/:id - delete session (admin)
-router.delete('/:id', authMiddleware, (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const existing = db.prepare('SELECT * FROM sessions WHERE id = ?').get(req.params.id);
+    const { data: existing, error: fetchError } = await supabase
+      .from('sessions')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
 
-    if (!existing) {
+    if (fetchError || !existing) {
       return res.status(404).json({ error: 'Session not found.' });
     }
 
-    db.prepare('DELETE FROM sessions WHERE id = ?').run(req.params.id);
+    const { error } = await supabase
+      .from('sessions')
+      .delete()
+      .eq('id', req.params.id);
+
+    if (error) throw error;
 
     res.json({ message: 'Session deleted successfully.' });
   } catch (err) {

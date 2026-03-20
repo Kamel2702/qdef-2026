@@ -1,13 +1,18 @@
 const express = require('express');
-const db = require('../db');
+const supabase = require('../supabase');
 const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
 // GET /api/config - get all config (public)
-router.get('/', (_req, res) => {
+router.get('/', async (_req, res) => {
   try {
-    const rows = db.prepare('SELECT key, value FROM config').all();
+    const { data: rows, error } = await supabase
+      .from('config')
+      .select('key, value');
+
+    if (error) throw error;
+
     const config = {};
     for (const row of rows) {
       try {
@@ -24,10 +29,16 @@ router.get('/', (_req, res) => {
 });
 
 // GET /api/config/:key - get single config value (public)
-router.get('/:key', (req, res) => {
+router.get('/:key', async (req, res) => {
   try {
-    const row = db.prepare('SELECT value FROM config WHERE key = ?').get(req.params.key);
-    if (!row) return res.status(404).json({ error: 'Config key not found.' });
+    const { data: row, error } = await supabase
+      .from('config')
+      .select('value')
+      .eq('key', req.params.key)
+      .single();
+
+    if (error || !row) return res.status(404).json({ error: 'Config key not found.' });
+
     try {
       res.json(JSON.parse(row.value));
     } catch {
@@ -40,20 +51,23 @@ router.get('/:key', (req, res) => {
 });
 
 // PUT /api/config - update multiple config values (admin)
-router.put('/', authMiddleware, (req, res) => {
+router.put('/', authMiddleware, async (req, res) => {
   try {
-    const upsert = db.prepare(`
-      INSERT INTO config (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
-      ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP
-    `);
+    const entries = Object.entries(req.body);
 
-    const updateMany = db.transaction((entries) => {
-      for (const [key, value] of Object.entries(entries)) {
-        upsert.run(key, typeof value === 'string' ? value : JSON.stringify(value));
-      }
-    });
+    for (const [key, value] of entries) {
+      const serialized = typeof value === 'string' ? value : JSON.stringify(value);
 
-    updateMany(req.body);
+      const { error } = await supabase
+        .from('config')
+        .upsert(
+          { key, value: serialized, updated_at: new Date().toISOString() },
+          { onConflict: 'key' }
+        );
+
+      if (error) throw error;
+    }
+
     res.json({ message: 'Config updated successfully.' });
   } catch (err) {
     console.error('Update config error:', err);
@@ -62,13 +76,19 @@ router.put('/', authMiddleware, (req, res) => {
 });
 
 // PUT /api/config/:key - update single config value (admin)
-router.put('/:key', authMiddleware, (req, res) => {
+router.put('/:key', authMiddleware, async (req, res) => {
   try {
     const { value } = req.body;
-    db.prepare(`
-      INSERT INTO config (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
-      ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP
-    `).run(req.params.key, typeof value === 'string' ? value : JSON.stringify(value));
+    const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+
+    const { error } = await supabase
+      .from('config')
+      .upsert(
+        { key: req.params.key, value: serialized, updated_at: new Date().toISOString() },
+        { onConflict: 'key' }
+      );
+
+    if (error) throw error;
 
     res.json({ message: 'Config key updated.' });
   } catch (err) {
