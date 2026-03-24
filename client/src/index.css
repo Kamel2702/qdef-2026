@@ -4117,12 +4117,23 @@ button {
   background: #1e293b;
 }
 
+/* Force dark backgrounds on all admin cards & tables */
+.admin-content .admin-table-wrapper,
+.admin-content .stat-card {
+  background: #162032;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
 .admin-content h1 {
   color: #f8fafc;
 }
 
 .admin-content > p {
   color: #94a3b8;
+}
+
+.admin-table-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
 }
 
 .admin-table-header h2 {
@@ -4140,21 +4151,12 @@ button {
   border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
+.admin-table td[style*="fontWeight"] {
+  color: #f8fafc;
+}
+
 .admin-table tr:hover td {
   background: rgba(255, 255, 255, 0.04);
-}
-
-.admin-table-wrapper {
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-.admin-table-header {
-  border-bottom-color: rgba(255, 255, 255, 0.08);
-}
-
-.stat-card {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .stat-card__label {
@@ -4251,6 +4253,13 @@ button {
 
 .admin-nav__logout:hover {
   color: #fca5a5;
+}
+
+/* Admin filter select */
+.admin-content .form-select {
+  background: rgba(255, 255, 255, 0.07);
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* ===== IMAGE UPLOAD COMPONENT ===== */

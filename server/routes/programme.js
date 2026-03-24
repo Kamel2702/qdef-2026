@@ -117,6 +117,41 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 });
 
+// PUT /api/sessions/reorder - reorder sessions by reassigning time slots (admin)
+router.put('/reorder', authMiddleware, async (req, res) => {
+  try {
+    const { ordered_ids } = req.body;
+    if (!Array.isArray(ordered_ids) || ordered_ids.length === 0) {
+      return res.status(400).json({ error: 'ordered_ids array is required.' });
+    }
+
+    const { data: sessions, error: fetchError } = await supabase
+      .from('sessions')
+      .select('id, start_time, end_time')
+      .order('start_time', { ascending: true });
+
+    if (fetchError) throw fetchError;
+
+    const timeSlots = sessions.map(s => ({ start_time: s.start_time, end_time: s.end_time }));
+
+    const updates = [];
+    for (let i = 0; i < ordered_ids.length && i < timeSlots.length; i++) {
+      updates.push(
+        supabase
+          .from('sessions')
+          .update({ start_time: timeSlots[i].start_time, end_time: timeSlots[i].end_time })
+          .eq('id', ordered_ids[i])
+      );
+    }
+
+    await Promise.all(updates);
+    res.json({ message: 'Sessions reordered.' });
+  } catch (err) {
+    console.error('Reorder sessions error:', err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 // PUT /api/sessions/:id - update session (admin)
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
