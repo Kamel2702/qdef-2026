@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import ImageUpload from '../../components/ImageUpload';
 
 const TIERS = [
   { value: 'organizer', label: 'Organizer' },
@@ -142,15 +143,14 @@ export default function ManageSponsors() {
                   <label className="form-label">Description</label>
                   <textarea name="description" className="form-textarea" value={form.description} onChange={handleChange} rows={2} placeholder="Short description" />
                 </div>
-                <div className="form-grid">
-                  <div className="form-group">
-                    <label className="form-label">Logo URL</label>
-                    <input type="text" name="logo_url" className="form-input" value={form.logo_url} onChange={handleChange} placeholder="https://..." />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Website URL</label>
-                    <input type="text" name="website_url" className="form-input" value={form.website_url} onChange={handleChange} placeholder="https://..." />
-                  </div>
+                <ImageUpload
+                  label="Logo"
+                  value={form.logo_url}
+                  onChange={url => setForm(prev => ({ ...prev, logo_url: url }))}
+                />
+                <div className="form-group">
+                  <label className="form-label">Website URL</label>
+                  <input type="text" name="website_url" className="form-input" value={form.website_url} onChange={handleChange} placeholder="https://..." />
                 </div>
               </div>
               <div className="modal__footer">

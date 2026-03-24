@@ -2324,39 +2324,7 @@ button {
   padding: var(--space-xl);
 }
 
-/* Fix form inputs for light theme in admin & modals */
-.admin-content .form-input,
-.admin-content .form-select,
-.admin-content .form-textarea,
-.modal .form-input,
-.modal .form-select,
-.modal .form-textarea {
-  background: #fff;
-  border: 1.5px solid var(--color-gray-200);
-  color: var(--color-gray-900);
-}
-
-.admin-content .form-input:focus,
-.admin-content .form-select:focus,
-.admin-content .form-textarea:focus,
-.modal .form-input:focus,
-.modal .form-select:focus,
-.modal .form-textarea:focus {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
-}
-
-.admin-content .form-input::placeholder,
-.admin-content .form-textarea::placeholder,
-.modal .form-input::placeholder,
-.modal .form-textarea::placeholder {
-  color: var(--color-gray-400);
-}
-
-.admin-content .form-label,
-.modal .form-label {
-  color: var(--color-gray-700);
-}
+/* Form overrides for admin/modals — see "Admin stays dark" section below */
 
 .modal__footer {
   display: flex;
@@ -4115,18 +4083,330 @@ button {
   border-color: transparent;
 }
 
-/* Admin stays dark */
+/* Admin stays dark — improved readability */
 .admin-layout {
   background: #0f172a;
-  color: #e2e8f0;
+  color: #f1f5f9;
 }
 
 .admin-sidebar {
   background: #0a1628;
 }
 
+.admin-sidebar__title {
+  color: #f8fafc;
+}
+
+.admin-sidebar__subtitle {
+  color: #94a3b8;
+}
+
+.admin-nav a {
+  color: #cbd5e1;
+}
+
+.admin-nav a:hover {
+  color: #f1f5f9;
+}
+
+.admin-nav a.active {
+  color: #ffffff;
+}
+
 .admin-content {
   background: #1e293b;
+}
+
+.admin-content h1 {
+  color: #f8fafc;
+}
+
+.admin-content > p {
+  color: #94a3b8;
+}
+
+.admin-table-header h2 {
+  color: #f1f5f9;
+}
+
+.admin-table th {
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.admin-table td {
+  color: #e2e8f0;
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.admin-table tr:hover td {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.admin-table-wrapper {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.admin-table-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.stat-card__label {
+  color: #94a3b8;
+}
+
+.stat-card__value {
+  color: #f8fafc;
+}
+
+.table-actions button {
+  color: #cbd5e1;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.table-actions button:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.admin-content .form-label,
+.modal .form-label {
+  color: #e2e8f0;
+}
+
+.modal {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal__header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.modal__header h2 {
+  color: #f8fafc;
+}
+
+.modal__footer {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.modal__close {
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.modal__close:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.admin-content .form-input,
+.admin-content .form-select,
+.admin-content .form-textarea,
+.modal .form-input,
+.modal .form-select,
+.modal .form-textarea {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  color: #f1f5f9;
+}
+
+.admin-content .form-input:focus,
+.admin-content .form-select:focus,
+.admin-content .form-textarea:focus,
+.modal .form-input:focus,
+.modal .form-select:focus,
+.modal .form-textarea:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+}
+
+.admin-content .form-input::placeholder,
+.admin-content .form-textarea::placeholder,
+.modal .form-input::placeholder,
+.modal .form-textarea::placeholder {
+  color: #64748b;
+}
+
+.admin-content .form-select option {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+.admin-content .badge,
+.modal .badge {
+  color: #f1f5f9;
+}
+
+.admin-nav__logout {
+  color: #cbd5e1;
+}
+
+.admin-nav__logout:hover {
+  color: #fca5a5;
+}
+
+/* ===== IMAGE UPLOAD COMPONENT ===== */
+.image-upload-zone {
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-upload-zone:hover {
+  border-color: var(--color-accent);
+  background: rgba(20, 184, 166, 0.04);
+}
+
+.image-upload-zone--active {
+  border-color: var(--color-accent);
+  background: rgba(20, 184, 166, 0.08);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+}
+
+.image-upload-preview {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+}
+
+.image-upload-preview img {
+  max-height: 140px;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+
+.image-upload-remove {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(239, 68, 68, 0.85);
+  color: #fff;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.image-upload-remove:hover {
+  background: #e63946;
+}
+
+.image-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  color: #64748b;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.image-upload-placeholder svg {
+  opacity: 0.5;
+}
+
+.image-upload-hint {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.image-upload-url {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.image-upload-url-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.image-upload-url .form-input {
+  flex: 1;
+}
+
+.image-upload-error {
+  color: #fca5a5;
+  font-size: 0.8rem;
+  margin-top: 0.35rem;
+}
+
+.image-upload-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== DRAG & DROP PROGRAMME ===== */
+.drag-table tbody tr {
+  cursor: grab;
+  transition: background 0.15s, opacity 0.15s, transform 0.15s;
+}
+
+.drag-table tbody tr:active {
+  cursor: grabbing;
+}
+
+.drag-table tbody tr.dragging {
+  opacity: 0.4;
+  background: rgba(20, 184, 166, 0.08);
+}
+
+.drag-table tbody tr.drag-over {
+  box-shadow: 0 -2px 0 0 var(--color-accent) inset;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s;
+}
+
+.drag-handle:hover {
+  color: #94a3b8;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
 }
 
 /* ===== TINDER-STYLE CARDS ===== */

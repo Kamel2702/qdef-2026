@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import ImageUpload from '../../components/ImageUpload';
 
 const emptySpeaker = {
   name: '',
@@ -242,17 +243,11 @@ export default function ManageSpeakers() {
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Photo URL</label>
-                  <input
-                    type="text"
-                    name="photo_url"
-                    className="form-input"
-                    value={form.photo_url}
-                    onChange={handleChange}
-                    placeholder="https://example.com/photo.jpg (optional)"
-                  />
-                </div>
+                <ImageUpload
+                  label="Photo"
+                  value={form.photo_url}
+                  onChange={url => setForm(prev => ({ ...prev, photo_url: url }))}
+                />
               </div>
 
               <div className="modal__footer">

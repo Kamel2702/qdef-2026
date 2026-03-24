@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 const emptySession = {
@@ -17,10 +17,16 @@ export default function ManageProgramme() {
   const [speakers, setSpeakers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [editing, setEditing] = useState(null); // null = creating new
+  const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptySession);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  // Drag & drop state
+  const dragItem = useRef(null);
+  const dragOverItem = useRef(null);
+  const [draggingIdx, setDraggingIdx] = useState(null);
+  const [dragOverIdx, setDragOverIdx] = useState(null);
 
   const headers = {
     Authorization: `Bearer ${token}`,
@@ -41,8 +47,6 @@ export default function ManageProgramme() {
 
   useEffect(() => {
     fetchSessions();
-
-    // Fetch speakers for the multi-select
     fetch('/api/speakers', { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.ok ? r.json() : [])
       .then(data => setSpeakers(Array.isArray(data) ? data : data.speakers || []))
@@ -53,6 +57,12 @@ export default function ManageProgramme() {
     if (!dateStr) return '-';
     const d = new Date(dateStr);
     return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
   }
 
   function openCreate() {
@@ -95,33 +105,23 @@ export default function ManageProgramme() {
   async function handleSave(e) {
     e.preventDefault();
     setError('');
-
     if (!form.title.trim()) {
       setError('Title is required.');
       return;
     }
-
     const payload = {
       ...form,
       tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
     };
-
     setSaving(true);
     try {
       const url = editing ? `/api/sessions/${editing.id}` : '/api/sessions';
       const method = editing ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
-        headers,
-        body: JSON.stringify(payload),
-      });
-
+      const res = await fetch(url, { method, headers, body: JSON.stringify(payload) });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.message || data.error || 'Failed to save session.');
       }
-
       setShowModal(false);
       fetchSessions();
     } catch (err) {
@@ -133,7 +133,6 @@ export default function ManageProgramme() {
 
   async function handleDelete(id) {
     if (!window.confirm('Are you sure you want to delete this session?')) return;
-
     try {
       const res = await fetch(`/api/sessions/${id}`, {
         method: 'DELETE',
@@ -146,12 +145,63 @@ export default function ManageProgramme() {
     }
   }
 
+  // --- Drag & drop handlers ---
+  function handleDragStart(idx) {
+    dragItem.current = idx;
+    setDraggingIdx(idx);
+  }
+
+  function handleDragEnter(idx) {
+    dragOverItem.current = idx;
+    setDragOverIdx(idx);
+  }
+
+  function handleDragEnd() {
+    if (dragItem.current === null || dragOverItem.current === null || dragItem.current === dragOverItem.current) {
+      setDraggingIdx(null);
+      setDragOverIdx(null);
+      return;
+    }
+    const reordered = [...sessions];
+    const [moved] = reordered.splice(dragItem.current, 1);
+    reordered.splice(dragOverItem.current, 0, moved);
+
+    // Reassign start_time based on new order to reflect the drag reorder
+    // We swap the times of the dragged and the target position
+    const fromSession = sessions[dragItem.current];
+    const toSession = sessions[dragOverItem.current];
+    if (fromSession.start_time && toSession.start_time) {
+      const movedIdx = dragOverItem.current;
+      const movedItem = reordered[movedIdx];
+      // Update the moved session's time to match where it was dropped
+      updateSessionTime(movedItem.id, toSession.start_time, toSession.end_time);
+    }
+
+    setSessions(reordered);
+    dragItem.current = null;
+    dragOverItem.current = null;
+    setDraggingIdx(null);
+    setDragOverIdx(null);
+  }
+
+  async function updateSessionTime(id, start_time, end_time) {
+    try {
+      await fetch(`/api/sessions/${id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ start_time, end_time }),
+      });
+    } catch {
+      // Silently fail, will refresh on next load
+    }
+  }
+
   if (loading) return <div className="loading">Loading sessions...</div>;
 
   return (
     <>
       <h1>Manage Programme</h1>
-      <p>Add, edit, or remove conference sessions.</p>
+      <p>Add, edit, or remove conference sessions. Drag rows to reorder.</p>
 
       <div className="admin-table-wrapper">
         <div className="admin-table-header">
@@ -162,13 +212,14 @@ export default function ManageProgramme() {
         </div>
 
         {sessions.length === 0 ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-gray-400)' }}>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>
             No sessions yet. Add your first session above.
           </div>
         ) : (
-          <table className="admin-table">
+          <table className="admin-table drag-table">
             <thead>
               <tr>
+                <th style={{ width: 40 }}></th>
                 <th>Time</th>
                 <th>Title</th>
                 <th>Type</th>
@@ -178,8 +229,31 @@ export default function ManageProgramme() {
             </thead>
             <tbody>
               {sessions.map((session, i) => (
-                <tr key={session.id || i}>
+                <tr
+                  key={session.id || i}
+                  draggable
+                  onDragStart={() => handleDragStart(i)}
+                  onDragEnter={() => handleDragEnter(i)}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={e => e.preventDefault()}
+                  className={`${draggingIdx === i ? 'dragging' : ''} ${dragOverIdx === i && draggingIdx !== i ? 'drag-over' : ''}`}
+                >
+                  <td>
+                    <div className="drag-handle" title="Drag to reorder">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="5" cy="3" r="1.5" />
+                        <circle cx="11" cy="3" r="1.5" />
+                        <circle cx="5" cy="8" r="1.5" />
+                        <circle cx="11" cy="8" r="1.5" />
+                        <circle cx="5" cy="13" r="1.5" />
+                        <circle cx="11" cy="13" r="1.5" />
+                      </svg>
+                    </div>
+                  </td>
                   <td style={{ whiteSpace: 'nowrap' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 2 }}>
+                      {formatDate(session.start_time)}
+                    </div>
                     {formatTime(session.start_time)} - {formatTime(session.end_time)}
                   </td>
                   <td style={{ fontWeight: 600 }}>{session.title}</td>
@@ -296,7 +370,7 @@ export default function ManageProgramme() {
                     <div style={{
                       maxHeight: 160,
                       overflowY: 'auto',
-                      border: '1px solid var(--color-gray-200)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
                       borderRadius: 'var(--radius-md)',
                       padding: 'var(--space-sm)',
                     }}>
@@ -313,16 +387,16 @@ export default function ManageProgramme() {
                             fontSize: '0.875rem',
                             transition: 'background 0.15s',
                           }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'var(--color-gray-50)'}
+                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
                           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                         >
                           <input
                             type="checkbox"
                             checked={form.speaker_ids.includes(s.id)}
                             onChange={() => handleSpeakerToggle(s.id)}
-                            style={{ accentColor: 'var(--color-blue)' }}
+                            style={{ accentColor: 'var(--color-accent)' }}
                           />
-                          {s.name} <span style={{ color: 'var(--color-gray-400)' }}>- {s.organization}</span>
+                          {s.name} <span style={{ color: '#94a3b8' }}>- {s.organization}</span>
                         </label>
                       ))}
                     </div>

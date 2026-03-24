@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import ImageUpload from '../../components/ImageUpload';
 
 const emptyExhibition = { name: '', description: '', image_url: '', tag: '', website_url: '', sort_order: 0 };
 
@@ -123,15 +124,14 @@ export default function ManageExhibitions() {
                   <label className="form-label">Description</label>
                   <textarea name="description" className="form-textarea" value={form.description} onChange={handleChange} rows={2} placeholder="Short description" />
                 </div>
-                <div className="form-grid">
-                  <div className="form-group">
-                    <label className="form-label">Image URL</label>
-                    <input type="text" name="image_url" className="form-input" value={form.image_url} onChange={handleChange} placeholder="https://..." />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Website URL</label>
-                    <input type="text" name="website_url" className="form-input" value={form.website_url} onChange={handleChange} placeholder="https://..." />
-                  </div>
+                <ImageUpload
+                  label="Image"
+                  value={form.image_url}
+                  onChange={url => setForm(prev => ({ ...prev, image_url: url }))}
+                />
+                <div className="form-group">
+                  <label className="form-label">Website URL</label>
+                  <input type="text" name="website_url" className="form-input" value={form.website_url} onChange={handleChange} placeholder="https://..." />
                 </div>
               </div>
               <div className="modal__footer">

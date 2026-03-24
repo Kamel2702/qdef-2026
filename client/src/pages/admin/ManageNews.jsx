@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import ImageUpload from '../../components/ImageUpload';
 
 const emptyArticle = { title: '', excerpt: '', content: '', image_url: '', published: false };
 
@@ -133,15 +134,14 @@ export default function ManageNews() {
                   <label className="form-label">Content</label>
                   <textarea name="content" className="form-textarea" value={form.content} onChange={handleChange} rows={8} placeholder="Full article content" />
                 </div>
-                <div className="form-grid">
-                  <div className="form-group">
-                    <label className="form-label">Image URL</label>
-                    <input type="text" name="image_url" className="form-input" value={form.image_url} onChange={handleChange} placeholder="https://..." />
-                  </div>
-                  <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '1.8rem' }}>
-                    <input type="checkbox" name="published" checked={form.published} onChange={handleChange} style={{ accentColor: 'var(--color-blue)' }} />
-                    <label className="form-label" style={{ margin: 0 }}>Published</label>
-                  </div>
+                <ImageUpload
+                  label="Cover Image"
+                  value={form.image_url}
+                  onChange={url => setForm(prev => ({ ...prev, image_url: url }))}
+                />
+                <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <input type="checkbox" name="published" checked={form.published} onChange={handleChange} style={{ accentColor: 'var(--color-accent)' }} />
+                  <label className="form-label" style={{ margin: 0 }}>Published</label>
                 </div>
               </div>
               <div className="modal__footer">
