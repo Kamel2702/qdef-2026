@@ -4148,12 +4148,12 @@ button {
 }
 
 .admin-sidebar__subtitle {
-  color: #64748b;
+  color: #94a3b8;
   font-size: 0.75rem;
 }
 
 .admin-nav a {
-  color: #94a3b8;
+  color: #e2e8f0;
   font-size: 0.85rem;
   padding: 0.55rem 1.25rem;
   border-radius: 6px;
@@ -4161,8 +4161,8 @@ button {
 }
 
 .admin-nav a:hover {
-  color: #e2e8f0;
-  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .admin-nav a.active {
@@ -4212,13 +4212,17 @@ button {
 }
 
 .admin-table th {
-  color: #94a3b8;
+  color: #cbd5e1;
   background: rgba(255, 255, 255, 0.04);
   border-bottom-color: rgba(255, 255, 255, 0.08);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
 }
 
 .admin-table td {
-  color: #e2e8f0;
+  color: #f1f5f9;
   border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
@@ -4263,7 +4267,12 @@ button {
 
 .admin-content .form-label,
 .modal .form-label {
-  color: #e2e8f0;
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+.admin-content p {
+  color: #94a3b8;
 }
 
 .modal {
@@ -4341,7 +4350,7 @@ button {
 }
 
 .admin-nav__logout {
-  color: #cbd5e1;
+  color: #e2e8f0;
 }
 
 .admin-nav__logout:hover {
