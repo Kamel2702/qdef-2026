@@ -35,6 +35,7 @@ import ManagePages from './pages/admin/ManagePages';
 import ManageConfig from './pages/admin/ManageConfig';
 import ManageAdmins from './pages/admin/ManageAdmins';
 import ManageDesign from './pages/admin/ManageDesign';
+import ManageHelp from './pages/admin/ManageHelp';
 
 export default function App() {
   return (
@@ -72,6 +73,7 @@ export default function App() {
           <Route path="admins" element={<ManageAdmins />} />
           <Route path="design" element={<ManageDesign />} />
           <Route path="settings" element={<ManageConfig />} />
+          <Route path="help" element={<ManageHelp />} />
         </Route>
       </Routes>
     </AuthProvider>
