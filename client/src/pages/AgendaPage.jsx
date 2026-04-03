@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import TicketLink from '../components/TicketLink';
 
 const TYPE_COLORS = {
   keynote: '#14b8a6',
@@ -247,7 +248,7 @@ export default function AgendaPage() {
 
               {/* CTA */}
               <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-                <Link to="/register" className="btn btn-gradient btn--lg">Register Now</Link>
+                <TicketLink className="btn btn-gradient btn--lg">Register Now</TicketLink>
               </div>
             </>
           )}

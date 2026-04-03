@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import TicketLink from '../components/TicketLink';
 
 const AVATAR_IMAGES = [
   'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=face',
@@ -107,7 +108,7 @@ export default function SpeakersPage() {
               <p>Ready to join them at Q-DEF 2026?</p>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}>
                 <button onClick={reset} className="btn btn-outline-glow">View Again</button>
-                <Link to="/register" className="btn btn-gradient">Attend the Event</Link>
+                <TicketLink className="btn btn-gradient">Attend the Event</TicketLink>
               </div>
             </div>
           ) : (

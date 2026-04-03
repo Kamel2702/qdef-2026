@@ -158,6 +158,10 @@ export default function HomePage() {
   const fmt = d => d ? new Date(d).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '';
   const r = k => el => { refs.current[k] = el; };
   const a = k => vis[k] ? 'fade-in-up visible' : 'fade-in-up';
+  const ticketUrl = config.ticket_url;
+  const TicketLink = ({ className, children, style }) => ticketUrl
+    ? <a href={ticketUrl} target="_blank" rel="noopener noreferrer" className={className} style={style}>{children}</a>
+    : <Link to="/register" className={className} style={style}>{children}</Link>;
 
   const themes = g(config, 'section_about_themes', 'Quantum Computing, Post-Quantum Crypto, Cyber Defense, AI & Defense, Quantum Sensing, Policy & Ethics')
     .split(',').map(t => t.trim()).filter(Boolean);
@@ -207,7 +211,7 @@ export default function HomePage() {
               {g(config, 'hero_subtitle_text', '300+ leaders in cybersecurity, quantum computing, and defense gather at Maison du Savoir, Esch-sur-Alzette.')}
             </p>
             <div className="hero__actions">
-              <Link to="/register" className="btn btn-gradient btn--lg">{g(config, 'hero_cta_primary', 'Attend the Event')}</Link>
+              <TicketLink className="btn btn-gradient btn--lg">{g(config, 'hero_cta_primary', 'Attend the Event')}</TicketLink>
               <Link to="/programme" className="btn btn-outline-light btn--lg">{g(config, 'hero_cta_secondary', 'Programme')}</Link>
             </div>
             <div className="hero__countdown">
@@ -274,7 +278,7 @@ export default function HomePage() {
                 {themes.map(t => <span className="theme-pill" key={t}>{t}</span>)}
               </div>
               <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
-                <Link to="/register" className="btn btn-gradient">{g(config, 'section_about_cta1', 'Get Your Ticket')}</Link>
+                <TicketLink className="btn btn-gradient">{g(config, 'section_about_cta1', 'Get Your Ticket')}</TicketLink>
                 <Link to="/about" className="btn btn-outline-glow">{g(config, 'section_about_cta2', 'Learn More')}</Link>
               </div>
             </div>
@@ -363,7 +367,7 @@ export default function HomePage() {
             <h3 className="cta-banner__title">{g(config, 'section_cta_title', 'Limited seats available.')}</h3>
             <p className="cta-banner__desc">{g(config, 'section_cta_subtitle', 'Join us November 25, 2026 at Maison du Savoir.')}</p>
           </div>
-          <Link to="/register" className="btn btn-gradient btn--lg">{g(config, 'section_cta_button', 'Reserve Your Seat')}</Link>
+          <TicketLink className="btn btn-gradient btn--lg">{g(config, 'section_cta_button', 'Reserve Your Seat')}</TicketLink>
         </div>
       </section>
       )}
@@ -403,7 +407,7 @@ export default function HomePage() {
         <div className="container section-cta__content">
           <h2 className="section-cta__title" style={{ color: '#fff' }}>{g(config, 'section_final_cta_title', 'Secure your place.')}</h2>
           <p className="section-cta__desc" style={{ color: 'rgba(255,255,255,0.7)' }}>{g(config, 'section_final_cta_subtitle', 'Join 300+ leaders shaping the future of quantum defense in Europe.')}</p>
-          <Link to="/register" className="btn btn-gradient btn--lg">{g(config, 'section_final_cta_button', 'Attend the Event')}</Link>
+          <TicketLink className="btn btn-gradient btn--lg">{g(config, 'section_final_cta_button', 'Attend the Event')}</TicketLink>
         </div>
       </section>
       )}

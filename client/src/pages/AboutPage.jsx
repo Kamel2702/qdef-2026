@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import TicketLink from '../components/TicketLink';
 
 export default function AboutPage() {
   return (
@@ -29,7 +30,7 @@ export default function AboutPage() {
                 Our 2026 edition focuses on the critical juncture where quantum computing
                 meets national security — exploring both the threats and the transformative potential.
               </p>
-              <Link to="/register" className="btn btn-gradient" style={{ marginTop: '1rem' }}>Attend the Event</Link>
+              <TicketLink className="btn btn-gradient" style={{ marginTop: '1rem' }}>Attend the Event</TicketLink>
             </div>
             <div className="about-preview__image">
               <img src="https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&q=80" alt="Q-DEF Conference" loading="lazy" />
@@ -105,7 +106,7 @@ export default function AboutPage() {
             ))}
           </div>
           <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
-            <Link to="/register" className="btn btn-gradient btn--lg">Register Now</Link>
+            <TicketLink className="btn btn-gradient btn--lg">Register Now</TicketLink>
           </div>
         </div>
       </section>
