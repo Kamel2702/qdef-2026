@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import Layout from './components/Layout';
 import AdminLayout from './components/AdminLayout';
 import DesignProvider from './components/DesignProvider';
+import PageGuard from './components/PageGuard';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -44,12 +45,12 @@ export default function App() {
         {/* Public pages wrapped in main Layout */}
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/programme" element={<ProgrammePage />} />
-          <Route path="/speakers" element={<SpeakersPage />} />
-          <Route path="/venue" element={<VenuePage />} />
-          <Route path="/register" element={<RegistrationPage />} />
-          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/about" element={<PageGuard configKey="page_about_visible"><AboutPage /></PageGuard>} />
+          <Route path="/programme" element={<PageGuard configKey="page_programme_visible"><ProgrammePage /></PageGuard>} />
+          <Route path="/speakers" element={<PageGuard configKey="page_speakers_visible"><SpeakersPage /></PageGuard>} />
+          <Route path="/venue" element={<PageGuard configKey="page_venue_visible"><VenuePage /></PageGuard>} />
+          <Route path="/register" element={<PageGuard configKey="page_register_visible"><RegistrationPage /></PageGuard>} />
+          <Route path="/contact" element={<PageGuard configKey="page_contact_visible"><ContactPage /></PageGuard>} />
           <Route path="/privacy" element={<PrivacyPage />} />
         </Route>
 

@@ -25,15 +25,18 @@ export default function Layout() {
   }, []);
 
   const g = (key, fallback) => config[key] || fallback;
+  const pageOn = (key) => { const v = config[key]; return v !== false && v !== 'false'; };
 
-  const navLinks = [
+  const allNavLinks = [
     { to: '/', label: 'Home' },
-    { to: '/programme', label: 'Programme' },
-    { to: '/speakers', label: 'Speakers' },
-    { to: '/about', label: 'About' },
-    { to: '/venue', label: 'Venue' },
-    { to: '/contact', label: 'Contact' },
+    { to: '/programme', label: 'Programme', configKey: 'page_programme_visible' },
+    { to: '/speakers', label: 'Speakers', configKey: 'page_speakers_visible' },
+    { to: '/about', label: 'About', configKey: 'page_about_visible' },
+    { to: '/venue', label: 'Venue', configKey: 'page_venue_visible' },
+    { to: '/contact', label: 'Contact', configKey: 'page_contact_visible' },
   ];
+
+  const navLinks = allNavLinks.filter(link => !link.configKey || pageOn(link.configKey));
 
   return (
     <>
@@ -61,12 +64,14 @@ export default function Layout() {
                 {label}
               </NavLink>
             ))}
-            <Link to="/register" className="header__cta">
-              Get Tickets
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
-              </svg>
-            </Link>
+            {pageOn('page_register_visible') && (
+              <Link to="/register" className="header__cta">
+                Get Tickets
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+                </svg>
+              </Link>
+            )}
           </nav>
 
           <button

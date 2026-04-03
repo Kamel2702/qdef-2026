@@ -28,6 +28,15 @@ const CONFIG_GROUPS = [
   },
 ];
 
+const PAGE_VISIBILITY = [
+  { key: 'page_programme_visible', label: 'Programme' },
+  { key: 'page_speakers_visible', label: 'Speakers' },
+  { key: 'page_about_visible', label: 'About' },
+  { key: 'page_venue_visible', label: 'Venue' },
+  { key: 'page_register_visible', label: 'Register' },
+  { key: 'page_contact_visible', label: 'Contact' },
+];
+
 const SECTION_VISIBILITY = [
   { key: 'section_hero_visible', label: 'Hero Section' },
   { key: 'section_stats_visible', label: 'Stats Bar' },
@@ -265,13 +274,55 @@ export default function ManageConfig() {
         </div>
       ))}
 
+      {/* Page Visibility */}
+      <div className="admin-table-wrapper" style={{ marginBottom: '1.5rem' }}>
+        <div className="admin-table-header">
+          <h2>Page Visibility</h2>
+        </div>
+        <div style={{ padding: '1.5rem' }}>
+          <p style={{ color: '#64748b', marginBottom: '1rem', fontSize: '0.9rem' }}>
+            Hide pages from the navigation menu. Hidden pages show a "Coming Soon" message.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
+            {PAGE_VISIBILITY.map(({ key, label }) => (
+              <label
+                key={key}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                  padding: '0.75rem 1rem', borderRadius: '8px',
+                  border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer',
+                  background: isOn(key) ? 'rgba(255,255,255,0.04)' : 'transparent',
+                  opacity: isOn(key) ? 1 : 0.4, transition: 'all 0.2s',
+                }}
+              >
+                <div
+                  onClick={(e) => { e.preventDefault(); handleToggle(key); }}
+                  style={{
+                    width: 40, height: 22, borderRadius: 11,
+                    background: isOn(key) ? 'var(--color-accent, #14b8a6)' : 'rgba(255,255,255,0.15)',
+                    position: 'relative', transition: 'background 0.2s', flexShrink: 0, cursor: 'pointer',
+                  }}
+                >
+                  <div style={{
+                    width: 18, height: 18, borderRadius: '50%', background: 'white',
+                    position: 'absolute', top: 2, left: isOn(key) ? 20 : 2,
+                    transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                  }} />
+                </div>
+                <span style={{ fontWeight: 500, fontSize: '0.9rem', color: '#e2e8f0' }}>{label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Section Visibility */}
       <div className="admin-table-wrapper" style={{ marginBottom: '1.5rem' }}>
         <div className="admin-table-header">
-          <h2>Section Visibility</h2>
+          <h2>Homepage Sections</h2>
         </div>
         <div style={{ padding: '1.5rem' }}>
-          <p style={{ color: 'var(--color-gray-500)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+          <p style={{ color: '#64748b', marginBottom: '1rem', fontSize: '0.9rem' }}>
             Toggle homepage sections on or off. Hidden sections won't appear for visitors.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.75rem' }}>
