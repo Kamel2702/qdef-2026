@@ -33,6 +33,11 @@ const QA = [
   { q: "Comment masquer une section depuis sa config ?", a: "Dans Settings, chaque section (Hero, Stats, About, etc.) a un toggle vert/rouge directement dans son header. Cliquez dessus pour basculer entre 'Visible' et 'Masque'. La section devient grisee quand elle est masquee." },
   { q: "Ou trouver la page Aide ?", a: "Cliquez sur 'Aide' dans le menu lateral (icone point d'interrogation), ou allez a /admin/help. Vous y trouverez la recherche Q&A, le manuel et le telechargement Word." },
   { q: "Comment telecharger le manuel en Word ?", a: "Allez dans Aide (/admin/help), cliquez sur le bouton 'Telecharger le manuel (Word)' en haut a droite. Le fichier .doc sera telecharge automatiquement." },
+  { q: "Comment ajouter des photos a la galerie ?", a: "Allez dans Galerie (/admin/gallery), cliquez '+ Ajouter une photo'. Uploadez par drag & drop ou collez une URL. Ajoutez une legende et une categorie. Les photos apparaissent sur la page /gallery." },
+  { q: "Comment creer une page personnalisee ?", a: "Allez dans Mes Pages (/admin/custom-pages), cliquez '+ Nouvelle page'. Donnez un titre (l'URL se genere automatiquement). Ajoutez des blocs (Texte, Image, Bouton CTA). Cochez 'Afficher dans le menu' pour qu'elle apparaisse dans la navigation." },
+  { q: "Comment rediriger vers Weezevent pour les inscriptions ?", a: "Allez dans Settings > Contact & Social. Remplissez le champ 'Ticket URL' avec votre lien Weezevent (ex: https://www.weezevent.com/qdef-2026). Tous les boutons d'inscription redirigeront automatiquement vers ce lien." },
+  { q: "L'upload d'image echoue", a: "Les images sont stockees sur Supabase Storage. Verifiez que la variable SUPABASE_SERVICE_KEY est configuree dans les variables d'environnement Netlify. Formats acceptes : JPG, PNG, GIF, WebP, SVG — max 5 MB." },
+  { q: "Comment voir l'agenda interactif ?", a: "La page Agenda est accessible a /agenda. Elle affiche les sessions en vue timeline (chronologique) ou grille. Les sessions se gerent dans Programme (/admin/programme). Vous pouvez masquer la page Agenda dans Settings > Page Visibility." },
 ];
 
 const MANUAL_SECTIONS = [
