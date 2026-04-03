@@ -187,10 +187,10 @@ export default function ManageHelp() {
                   padding: '1rem 1.25rem',
                   marginBottom: '0.75rem',
                 }}>
-                  <div style={{ fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem', fontSize: '0.95rem' }}>
+                  <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: '0.4rem', fontSize: '0.95rem' }}>
                     {item.q}
                   </div>
-                  <div style={{ color: '#94a3b8', lineHeight: 1.6, fontSize: '0.9rem' }}>
+                  <div style={{ color: '#475569', lineHeight: 1.6, fontSize: '0.9rem' }}>
                     {item.a}
                   </div>
                 </div>
@@ -205,8 +205,8 @@ export default function ManageHelp() {
                   key={tag}
                   onClick={() => handleSearch(tag)}
                   style={{
-                    padding: '0.35rem 0.85rem', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)',
-                    background: 'rgba(255,255,255,0.04)', color: '#94a3b8', fontSize: '0.8rem',
+                    padding: '0.35rem 0.85rem', borderRadius: '20px', border: '1px solid #e2e8f0',
+                    background: '#f8fafc', color: '#334155', fontSize: '0.8rem',
                     cursor: 'pointer', transition: 'all 0.15s',
                   }}
                 >
@@ -229,12 +229,12 @@ export default function ManageHelp() {
             {MANUAL_SECTIONS.map((section, i) => (
               <div key={i} style={{
                 marginBottom: '1rem', paddingBottom: '1rem',
-                borderBottom: i < MANUAL_SECTIONS.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                borderBottom: i < MANUAL_SECTIONS.length - 1 ? '1px solid #e2e8f0' : 'none',
               }}>
-                <h3 style={{ color: '#e2e8f0', fontSize: '1rem', marginBottom: '0.35rem' }}>
+                <h3 style={{ color: '#1e293b', fontSize: '1rem', marginBottom: '0.35rem' }}>
                   {i + 1}. {section.title}
                 </h3>
-                <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.9rem', lineHeight: 1.6 }}>
+                <p style={{ color: '#475569', margin: 0, fontSize: '0.9rem', lineHeight: 1.6 }}>
                   {section.content}
                 </p>
               </div>
@@ -252,17 +252,17 @@ export default function ManageHelp() {
           {QA.map((item, i) => (
             <details key={i} style={{
               marginBottom: '0.5rem', borderRadius: '8px',
-              border: '1px solid rgba(255,255,255,0.06)',
+              border: '1px solid #e2e8f0',
               overflow: 'hidden',
             }}>
               <summary style={{
                 padding: '0.75rem 1rem', cursor: 'pointer',
-                fontWeight: 600, color: '#e2e8f0', fontSize: '0.9rem',
-                background: 'rgba(255,255,255,0.03)',
+                fontWeight: 600, color: '#1e293b', fontSize: '0.9rem',
+                background: '#f8fafc',
               }}>
                 {item.q}
               </summary>
-              <div style={{ padding: '0.75rem 1rem', color: '#94a3b8', fontSize: '0.875rem', lineHeight: 1.6, background: 'rgba(255,255,255,0.01)' }}>
+              <div style={{ padding: '0.75rem 1rem', color: '#475569', fontSize: '0.875rem', lineHeight: 1.6, background: '#fafafa' }}>
                 {item.a}
               </div>
             </details>

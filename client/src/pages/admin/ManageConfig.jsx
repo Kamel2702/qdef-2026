@@ -301,26 +301,26 @@ export default function ManageConfig() {
                 style={{
                   display: 'flex', alignItems: 'center', gap: '0.75rem',
                   padding: '0.75rem 1rem', borderRadius: '8px',
-                  border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer',
-                  background: isOn(key) ? 'rgba(255,255,255,0.04)' : 'transparent',
-                  opacity: isOn(key) ? 1 : 0.4, transition: 'all 0.2s',
+                  border: '1px solid #e2e8f0', cursor: 'pointer',
+                  background: isOn(key) ? '#f8fafc' : '#ffffff',
+                  opacity: isOn(key) ? 1 : 0.5, transition: 'all 0.2s',
                 }}
               >
                 <div
                   onClick={(e) => { e.preventDefault(); handleToggle(key); }}
                   style={{
                     width: 40, height: 22, borderRadius: 11,
-                    background: isOn(key) ? 'var(--color-accent, #14b8a6)' : 'rgba(255,255,255,0.15)',
+                    background: isOn(key) ? '#14b8a6' : '#cbd5e1',
                     position: 'relative', transition: 'background 0.2s', flexShrink: 0, cursor: 'pointer',
                   }}
                 >
                   <div style={{
                     width: 18, height: 18, borderRadius: '50%', background: 'white',
                     position: 'absolute', top: 2, left: isOn(key) ? 20 : 2,
-                    transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                    transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
                   }} />
                 </div>
-                <span style={{ fontWeight: 500, fontSize: '0.9rem', color: '#e2e8f0' }}>{label}</span>
+                <span style={{ fontWeight: 600, fontSize: '0.9rem', color: '#1e293b' }}>{label}</span>
               </label>
             ))}
           </div>
@@ -388,7 +388,7 @@ export default function ManageConfig() {
                   onClick={() => handleToggle(group.visibilityKey)}
                   style={{
                     width: 40, height: 22, borderRadius: 11, cursor: 'pointer',
-                    background: isOn(group.visibilityKey) ? '#10b981' : 'rgba(255,255,255,0.15)',
+                    background: isOn(group.visibilityKey) ? '#10b981' : '#cbd5e1',
                     position: 'relative', transition: 'background 0.2s', flexShrink: 0,
                   }}
                 >

@@ -180,11 +180,27 @@ export default function ManageDesign() {
     }
   }
 
-  function applyPreset(preset) {
+  async function applyPreset(preset) {
     const next = { ...config, ...preset.values };
     setConfig(next);
-    setSaved(false);
     Object.entries(preset.values).forEach(([k, v]) => applyDesignVar(k, v));
+
+    // Auto-save preset
+    setSaving(true);
+    try {
+      const res = await fetch('/api/config', {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(next),
+      });
+      if (!res.ok) throw new Error('Save failed');
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch {
+      alert('Failed to save preset.');
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleSave() {
