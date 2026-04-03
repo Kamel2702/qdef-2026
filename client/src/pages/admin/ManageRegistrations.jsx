@@ -1,12 +1,33 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
+const emptyForm = {
+  first_name: '',
+  last_name: '',
+  organization: '',
+  position: '',
+  email: '',
+  country: '',
+  dietary_requirements: '',
+  accessibility_needs: '',
+};
+
 export default function ManageRegistrations() {
   const { token } = useAuth();
   const [registrations, setRegistrations] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
 
   const fetchRegistrations = useCallback(() => {
     fetch('/api/registrations', {
@@ -15,7 +36,6 @@ export default function ManageRegistrations() {
       .then(r => r.ok ? r.json() : [])
       .then(data => {
         const list = Array.isArray(data) ? data : data.registrations || [];
-        // Sort newest first
         list.sort(
           (a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0)
         );
@@ -30,7 +50,6 @@ export default function ManageRegistrations() {
     fetchRegistrations();
   }, [fetchRegistrations]);
 
-  // Filter on search change
   useEffect(() => {
     if (!search.trim()) {
       setFiltered(registrations);
@@ -45,6 +64,58 @@ export default function ManageRegistrations() {
       )
     );
   }, [search, registrations]);
+
+  function openEdit(reg) {
+    setEditing(reg);
+    setForm({
+      first_name: reg.first_name || '',
+      last_name: reg.last_name || '',
+      organization: reg.organization || '',
+      position: reg.position || '',
+      email: reg.email || '',
+      country: reg.country || '',
+      dietary_requirements: reg.dietary_requirements || '',
+      accessibility_needs: reg.accessibility_needs || '',
+    });
+    setError('');
+    setShowModal(true);
+  }
+
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  }
+
+  async function handleSave(e) {
+    e.preventDefault();
+    setError('');
+
+    if (!form.first_name.trim() || !form.last_name.trim() || !form.email.trim()) {
+      setError('First name, last name, and email are required.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/registrations/${editing.id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to update registration.');
+      }
+
+      setShowModal(false);
+      fetchRegistrations();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function handleDelete(id) {
     if (!window.confirm('Are you sure you want to delete this registration?')) return;
@@ -88,7 +159,7 @@ export default function ManageRegistrations() {
   return (
     <>
       <h1>Manage Registrations</h1>
-      <p>View, search, and manage conference registrations.</p>
+      <p>View, search, edit, and manage conference registrations.</p>
 
       <div className="admin-table-wrapper">
         <div className="admin-table-header">
@@ -152,6 +223,7 @@ export default function ManageRegistrations() {
                   </td>
                   <td>
                     <div className="table-actions">
+                      <button onClick={() => openEdit(reg)}>Edit</button>
                       <button className="delete" onClick={() => handleDelete(reg.id)}>
                         Delete
                       </button>
@@ -163,6 +235,73 @@ export default function ManageRegistrations() {
           </table>
         )}
       </div>
+
+      {/* Edit Modal */}
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal__header">
+              <h2>Edit Registration</h2>
+              <button className="modal__close" onClick={() => setShowModal(false)}>&times;</button>
+            </div>
+
+            <form onSubmit={handleSave}>
+              <div className="modal__body">
+                {error && <div className="alert alert--error">{error}</div>}
+
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label className="form-label">First Name <span className="required">*</span></label>
+                    <input type="text" name="first_name" className="form-input" value={form.first_name} onChange={handleChange} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Last Name <span className="required">*</span></label>
+                    <input type="text" name="last_name" className="form-input" value={form.last_name} onChange={handleChange} />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Email <span className="required">*</span></label>
+                  <input type="email" name="email" className="form-input" value={form.email} onChange={handleChange} />
+                </div>
+
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label className="form-label">Organization</label>
+                    <input type="text" name="organization" className="form-input" value={form.organization} onChange={handleChange} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Position</label>
+                    <input type="text" name="position" className="form-input" value={form.position} onChange={handleChange} />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Country</label>
+                  <input type="text" name="country" className="form-input" value={form.country} onChange={handleChange} />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Dietary Requirements</label>
+                  <input type="text" name="dietary_requirements" className="form-input" value={form.dietary_requirements} onChange={handleChange} />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Accessibility Needs</label>
+                  <textarea name="accessibility_needs" className="form-textarea" value={form.accessibility_needs} onChange={handleChange} rows={3} />
+                </div>
+              </div>
+
+              <div className="modal__footer">
+                <button type="button" className="btn btn--ghost" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn--primary" disabled={saving}>
+                  {saving ? 'Saving...' : 'Update Registration'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -4,6 +4,7 @@ import { Outlet, Link, NavLink, useLocation } from 'react-router-dom';
 export default function Layout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [config, setConfig] = useState({});
   const location = useLocation();
 
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
@@ -19,6 +20,12 @@ export default function Layout() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    fetch('/api/config').then(r => r.ok ? r.json() : {}).then(setConfig).catch(() => {});
+  }, []);
+
+  const g = (key, fallback) => config[key] || fallback;
+
   const navLinks = [
     { to: '/', label: 'Home' },
     { to: '/programme', label: 'Programme' },
@@ -33,8 +40,8 @@ export default function Layout() {
       <header className={`header ${scrolled ? 'header--scrolled' : ''}`}>
         <div className="header__inner">
           <Link to="/" className="header__logo">
-            <span className="logo-text">Q-DEF</span>
-            <span className="logo-year">2026</span>
+            <span className="logo-text">{g('hero_logo_text', 'Q-DEF')}</span>
+            <span className="logo-year">{g('hero_logo_year', '2026')}</span>
           </Link>
 
           <nav className={`header__nav ${menuOpen ? 'open' : ''}`}>
@@ -76,16 +83,20 @@ export default function Layout() {
           <div className="footer__grid">
             <div className="footer__brand">
               <div className="footer__brand-name">
-                <span className="logo-text" style={{ fontSize: '1.8rem' }}>Q-DEF</span>
-                <span className="logo-year" style={{ fontSize: '0.7rem' }}>2026</span>
+                <span className="logo-text" style={{ fontSize: '1.8rem' }}>{g('footer_logo_text', g('hero_logo_text', 'Q-DEF'))}</span>
+                <span className="logo-year" style={{ fontSize: '0.7rem' }}>{g('footer_logo_year', g('hero_logo_year', '2026'))}</span>
               </div>
-              <p className="footer__tagline">Quantum Defense &amp; Emerging Technologies</p>
+              <p className="footer__tagline">{g('footer_tagline', 'Quantum Defense & Emerging Technologies')}</p>
               <p className="footer__description">
-                The premier European summit bringing together world-leading experts
-                in quantum technologies, cybersecurity, and national defense.
+                {g('footer_description', 'The premier European summit bringing together world-leading experts in quantum technologies, cybersecurity, and national defense.')}
               </p>
               <div className="footer__social">
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="footer__social-link">LinkedIn</a>
+                {g('social_linkedin', 'https://linkedin.com') && (
+                  <a href={g('social_linkedin', 'https://linkedin.com')} target="_blank" rel="noopener noreferrer" className="footer__social-link">LinkedIn</a>
+                )}
+                {config.social_twitter && (
+                  <a href={config.social_twitter} target="_blank" rel="noopener noreferrer" className="footer__social-link">Twitter/X</a>
+                )}
               </div>
             </div>
             <div>
@@ -108,13 +119,13 @@ export default function Layout() {
             </div>
             <div>
               <h4 className="footer__heading">Contact</h4>
-              <div className="footer__contact-item"><span>info@qdef-conference.lu</span></div>
-              <div className="footer__contact-item"><span>+352 123 456 789</span></div>
-              <div className="footer__contact-item"><span>Maison du Savoir, Esch-sur-Alzette</span></div>
+              <div className="footer__contact-item"><span>{g('footer_email', g('contact_email', 'info@qdef-conference.lu'))}</span></div>
+              <div className="footer__contact-item"><span>{g('footer_phone', g('contact_phone', '+352 123 456 789'))}</span></div>
+              <div className="footer__contact-item"><span>{g('footer_address', g('event_location', 'Maison du Savoir, Esch-sur-Alzette'))}</span></div>
             </div>
           </div>
           <div className="footer__bottom">
-            <p>&copy; {new Date().getFullYear()} Q-DEF Conference Luxembourg. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} {g('footer_copyright', 'Q-DEF Conference Luxembourg')}. All rights reserved.</p>
           </div>
         </div>
       </footer>

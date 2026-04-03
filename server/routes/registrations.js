@@ -231,6 +231,46 @@ router.get('/stats', authMiddleware, async (req, res) => {
   }
 });
 
+// PUT /api/registrations/:id - update registration (admin)
+router.put('/:id', authMiddleware, async (req, res) => {
+  try {
+    const { data: existing, error: fetchError } = await supabase
+      .from('registrations')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
+
+    if (fetchError || !existing) {
+      return res.status(404).json({ error: 'Registration not found.' });
+    }
+
+    const { first_name, last_name, organization, position, email, country, dietary_requirements, accessibility_needs } = req.body;
+
+    const { data: registration, error } = await supabase
+      .from('registrations')
+      .update({
+        first_name: first_name !== undefined ? first_name : existing.first_name,
+        last_name: last_name !== undefined ? last_name : existing.last_name,
+        organization: organization !== undefined ? organization : existing.organization,
+        position: position !== undefined ? position : existing.position,
+        email: email !== undefined ? email : existing.email,
+        country: country !== undefined ? country : existing.country,
+        dietary_requirements: dietary_requirements !== undefined ? dietary_requirements : existing.dietary_requirements,
+        accessibility_needs: accessibility_needs !== undefined ? accessibility_needs : existing.accessibility_needs
+      })
+      .eq('id', req.params.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json(registration);
+  } catch (err) {
+    console.error('Update registration error:', err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 // DELETE /api/registrations/:id - delete registration (admin)
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {

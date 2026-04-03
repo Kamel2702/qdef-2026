@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import Layout from './components/Layout';
 import AdminLayout from './components/AdminLayout';
+import DesignProvider from './components/DesignProvider';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -31,11 +32,14 @@ import ManageContacts from './pages/admin/ManageContacts';
 import ManageNewsletter from './pages/admin/ManageNewsletter';
 import ManagePages from './pages/admin/ManagePages';
 import ManageConfig from './pages/admin/ManageConfig';
+import ManageAdmins from './pages/admin/ManageAdmins';
+import ManageDesign from './pages/admin/ManageDesign';
 
 export default function App() {
   return (
     <AuthProvider>
       <ScrollToTop />
+      <DesignProvider />
       <Routes>
         {/* Public pages wrapped in main Layout */}
         <Route element={<Layout />}>
@@ -64,6 +68,8 @@ export default function App() {
           <Route path="contacts" element={<ManageContacts />} />
           <Route path="newsletter" element={<ManageNewsletter />} />
           <Route path="pages" element={<ManagePages />} />
+          <Route path="admins" element={<ManageAdmins />} />
+          <Route path="design" element={<ManageDesign />} />
           <Route path="settings" element={<ManageConfig />} />
         </Route>
       </Routes>

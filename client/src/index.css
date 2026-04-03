@@ -599,7 +599,7 @@ button {
   font-family: var(--font-family);
   font-size: 0.9rem;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: var(--radius-btn, 8px);
   border: none;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);

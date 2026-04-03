@@ -55,6 +55,41 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
+// PUT /api/contacts/:id - full edit contact (admin)
+router.put('/:id', authMiddleware, async (req, res) => {
+  try {
+    const { data: existing, error: fetchError } = await supabase
+      .from('contacts')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
+
+    if (fetchError || !existing) return res.status(404).json({ error: 'Contact not found.' });
+
+    const { name, email, subject, message, status } = req.body;
+
+    const { data: contact, error } = await supabase
+      .from('contacts')
+      .update({
+        name: name !== undefined ? name : existing.name,
+        email: email !== undefined ? email : existing.email,
+        subject: subject !== undefined ? subject : existing.subject,
+        message: message !== undefined ? message : existing.message,
+        status: status !== undefined ? status : existing.status
+      })
+      .eq('id', req.params.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json(contact);
+  } catch (err) {
+    console.error('Update contact error:', err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 // PUT /api/contacts/:id/status - update status (admin)
 router.put('/:id/status', authMiddleware, async (req, res) => {
   try {

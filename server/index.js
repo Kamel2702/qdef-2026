@@ -30,6 +30,7 @@ const newsletterRoutes = require('./routes/newsletter');
 const exhibitionsRoutes = require('./routes/exhibitions');
 const uploadsRoutes = require('./routes/uploads');
 const statsRoutes = require('./routes/stats');
+const adminsRoutes = require('./routes/admins');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/sessions', programmeRoutes);
@@ -45,6 +46,7 @@ app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/exhibitions', exhibitionsRoutes);
 app.use('/api/uploads', uploadsRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/admins', adminsRoutes);
 
 // Serve static files from the client build (production)
 const clientDistPath = path.join(__dirname, '..', 'client', 'dist');

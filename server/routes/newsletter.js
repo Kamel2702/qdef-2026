@@ -87,6 +87,38 @@ router.get('/export', authMiddleware, async (req, res) => {
   }
 });
 
+// PUT /api/newsletter/:id - update subscriber (admin)
+router.put('/:id', authMiddleware, async (req, res) => {
+  try {
+    const { data: existing, error: fetchError } = await supabase
+      .from('newsletter')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
+
+    if (fetchError || !existing) return res.status(404).json({ error: 'Subscriber not found.' });
+
+    const { email, source } = req.body;
+
+    const { data: subscriber, error } = await supabase
+      .from('newsletter')
+      .update({
+        email: email !== undefined ? email : existing.email,
+        source: source !== undefined ? source : existing.source
+      })
+      .eq('id', req.params.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json(subscriber);
+  } catch (err) {
+    console.error('Update subscriber error:', err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 // DELETE /api/newsletter/:id - unsubscribe (admin)
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {

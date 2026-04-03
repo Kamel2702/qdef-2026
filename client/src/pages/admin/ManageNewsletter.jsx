@@ -6,6 +6,16 @@ export default function ManageNewsletter() {
   const [subscribers, setSubscribers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ email: '', source: '' });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
 
   const fetchSubscribers = useCallback(() => {
     fetch('/api/newsletter', { headers: { Authorization: `Bearer ${token}` } })
@@ -20,6 +30,52 @@ export default function ManageNewsletter() {
   const filtered = search.trim()
     ? subscribers.filter(s => s.email.toLowerCase().includes(search.toLowerCase()))
     : subscribers;
+
+  function openEdit(sub) {
+    setEditing(sub);
+    setForm({
+      email: sub.email || '',
+      source: sub.source || '',
+    });
+    setError('');
+    setShowModal(true);
+  }
+
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  }
+
+  async function handleSave(e) {
+    e.preventDefault();
+    setError('');
+
+    if (!form.email.trim()) {
+      setError('Email is required.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/newsletter/${editing.id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to update subscriber.');
+      }
+
+      setShowModal(false);
+      fetchSubscribers();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function handleDelete(id) {
     if (!window.confirm('Remove this subscriber?')) return;
@@ -85,6 +141,7 @@ export default function ManageNewsletter() {
                   </td>
                   <td>
                     <div className="table-actions">
+                      <button onClick={() => openEdit(s)}>Edit</button>
                       <button className="delete" onClick={() => handleDelete(s.id)}>Remove</button>
                     </div>
                   </td>
@@ -94,6 +151,41 @@ export default function ManageNewsletter() {
           </table>
         )}
       </div>
+
+      {/* Edit Modal */}
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal__header">
+              <h2>Edit Subscriber</h2>
+              <button className="modal__close" onClick={() => setShowModal(false)}>&times;</button>
+            </div>
+
+            <form onSubmit={handleSave}>
+              <div className="modal__body">
+                {error && <div className="alert alert--error">{error}</div>}
+
+                <div className="form-group">
+                  <label className="form-label">Email <span className="required">*</span></label>
+                  <input type="email" name="email" className="form-input" value={form.email} onChange={handleChange} />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Source</label>
+                  <input type="text" name="source" className="form-input" value={form.source} onChange={handleChange} placeholder="e.g. website, import, manual" />
+                </div>
+              </div>
+
+              <div className="modal__footer">
+                <button type="button" className="btn btn--ghost" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn--primary" disabled={saving}>
+                  {saving ? 'Saving...' : 'Update Subscriber'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }
