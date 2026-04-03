@@ -152,14 +152,6 @@ export default function SpeakersPage() {
                   <img src={getImage(current)} alt={speakers[current].name} className="tinder-card__img" />
                   <div className="tinder-card__overlay" />
 
-                  {/* Swipe indicators */}
-                  <div className="tinder-card__label tinder-card__label--like" style={{ opacity: Math.max(0, dragX / 150) }}>
-                    INTERESTED
-                  </div>
-                  <div className="tinder-card__label tinder-card__label--nope" style={{ opacity: Math.max(0, -dragX / 150) }}>
-                    NEXT
-                  </div>
-
                   <div className="tinder-card__info">
                     <h2 className="tinder-card__name">{speakers[current].name}</h2>
                     <p className="tinder-card__title">{speakers[current].title}</p>
@@ -169,21 +161,16 @@ export default function SpeakersPage() {
                 </div>
               </div>
 
-              {/* Action buttons */}
+              {/* Navigation arrows */}
               <div className="tinder-actions">
-                <button className="tinder-btn tinder-btn--nope" onClick={() => handleSwipe('left')}>
+                <button className="tinder-btn tinder-btn--prev" onClick={() => handleSwipe('left')}>
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    <polyline points="15 18 9 12 15 6" />
                   </svg>
                 </button>
-                <button className="tinder-btn tinder-btn--info" onClick={() => handleSwipe('right')}>
+                <button className="tinder-btn tinder-btn--next" onClick={() => handleSwipe('right')}>
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-                  </svg>
-                </button>
-                <button className="tinder-btn tinder-btn--like" onClick={() => handleSwipe('right')}>
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    <polyline points="9 18 15 12 9 6" />
                   </svg>
                 </button>
               </div>
