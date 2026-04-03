@@ -40,8 +40,14 @@ export default function Layout() {
       <header className={`header ${scrolled ? 'header--scrolled' : ''}`}>
         <div className="header__inner">
           <Link to="/" className="header__logo">
-            <span className="logo-text">{g('hero_logo_text', 'Q-DEF')}</span>
-            <span className="logo-year">{g('hero_logo_year', '2026')}</span>
+            {config.site_logo ? (
+              <img src={config.site_logo} alt={g('hero_logo_text', 'Q-DEF')} className="header__logo-img" />
+            ) : (
+              <>
+                <span className="logo-text">{g('hero_logo_text', 'Q-DEF')}</span>
+                <span className="logo-year">{g('hero_logo_year', '2026')}</span>
+              </>
+            )}
           </Link>
 
           <nav className={`header__nav ${menuOpen ? 'open' : ''}`}>
@@ -83,8 +89,14 @@ export default function Layout() {
           <div className="footer__grid">
             <div className="footer__brand">
               <div className="footer__brand-name">
-                <span className="logo-text" style={{ fontSize: '1.8rem' }}>{g('footer_logo_text', g('hero_logo_text', 'Q-DEF'))}</span>
-                <span className="logo-year" style={{ fontSize: '0.7rem' }}>{g('footer_logo_year', g('hero_logo_year', '2026'))}</span>
+                {config.site_logo ? (
+                  <img src={config.site_logo} alt={g('hero_logo_text', 'Q-DEF')} className="footer__logo-img" />
+                ) : (
+                  <>
+                    <span className="logo-text" style={{ fontSize: '1.8rem' }}>{g('footer_logo_text', g('hero_logo_text', 'Q-DEF'))}</span>
+                    <span className="logo-year" style={{ fontSize: '0.7rem' }}>{g('footer_logo_year', g('hero_logo_year', '2026'))}</span>
+                  </>
+                )}
               </div>
               <p className="footer__tagline">{g('footer_tagline', 'Quantum Defense & Emerging Technologies')}</p>
               <p className="footer__description">

@@ -4089,39 +4089,110 @@ button {
   color: #f1f5f9;
 }
 
+/* ===== ADMIN PAGE HEADER (sticky) ===== */
+.admin-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -var(--space-2xl);
+  margin-bottom: 1.5rem;
+  padding: 1.25rem var(--space-2xl);
+  background: #162032;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-radius: 0;
+  margin: -2rem -2rem 1.5rem -2rem;
+  padding: 1.25rem 2rem;
+}
+
+.admin-page-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.admin-page-header p {
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+/* ===== LOGO IMAGE SUPPORT ===== */
+.header__logo-img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+}
+
+.footer__logo-img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
+
 .admin-sidebar {
-  background: #0a1628;
+  background: linear-gradient(180deg, #0a1628 0%, #0d1b2f 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.admin-sidebar__header {
+  padding: 1.25rem 1.5rem 1.25rem;
 }
 
 .admin-sidebar__title {
   color: #f8fafc;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
 }
 
 .admin-sidebar__subtitle {
-  color: #94a3b8;
+  color: #64748b;
+  font-size: 0.75rem;
 }
 
 .admin-nav a {
-  color: #cbd5e1;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  padding: 0.55rem 1.25rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
 }
 
 .admin-nav a:hover {
-  color: #f1f5f9;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .admin-nav a.active {
   color: #ffffff;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.2), rgba(20, 184, 166, 0.08));
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+.admin-nav a svg {
+  width: 17px;
+  height: 17px;
+  opacity: 0.7;
+}
+
+.admin-nav a.active svg {
+  opacity: 1;
+  color: var(--color-accent);
 }
 
 .admin-content {
-  background: #1e293b;
+  background: #131c2e;
 }
 
 /* Force dark backgrounds on all admin cards & tables */
 .admin-content .admin-table-wrapper,
 .admin-content .stat-card {
-  background: #162032;
-  border-color: rgba(255, 255, 255, 0.08);
+  background: #1a2540;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .admin-content h1 {
@@ -4168,13 +4239,26 @@ button {
 }
 
 .table-actions button {
-  color: #cbd5e1;
-  border-color: rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
 }
 
 .table-actions button:hover {
   border-color: var(--color-accent);
   color: var(--color-accent);
+  background: rgba(20, 184, 166, 0.08);
+}
+
+.table-actions button.delete:hover {
+  border-color: #f87171;
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.08);
 }
 
 .admin-content .form-label,
@@ -4183,20 +4267,25 @@ button {
 }
 
 .modal {
-  background: #1e293b;
-  border-color: rgba(255, 255, 255, 0.1);
+  background: #1a2540;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
 }
 
 .modal__header {
-  border-bottom-color: rgba(255, 255, 255, 0.08);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+  padding: 1.25rem 1.5rem;
 }
 
 .modal__header h2 {
   color: #f8fafc;
+  font-size: 1.15rem;
 }
 
 .modal__footer {
-  border-top-color: rgba(255, 255, 255, 0.08);
+  border-top-color: rgba(255, 255, 255, 0.06);
+  padding: 1rem 1.5rem;
 }
 
 .modal__close {
@@ -4215,9 +4304,12 @@ button {
 .modal .form-input,
 .modal .form-select,
 .modal .form-textarea {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
   color: #f1f5f9;
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  transition: all 0.15s ease;
 }
 
 .admin-content .form-input:focus,
@@ -4227,7 +4319,8 @@ button {
 .modal .form-select:focus,
 .modal .form-textarea:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .admin-content .form-input::placeholder,

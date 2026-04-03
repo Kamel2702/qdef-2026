@@ -42,6 +42,14 @@ const SECTION_VISIBILITY = [
 
 const SECTION_CONFIG = [
   {
+    label: 'Logo & Branding',
+    fields: [
+      { key: 'site_logo', label: 'Site Logo (replaces text logo everywhere)', type: 'image' },
+      { key: 'hero_logo_text', label: 'Logo Text (fallback if no image)', type: 'text', placeholder: 'Q-DEF' },
+      { key: 'hero_logo_year', label: 'Logo Year', type: 'text', placeholder: '2026' },
+    ],
+  },
+  {
     label: 'Hero Section',
     fields: [
       { key: 'hero_bg_image', label: 'Background Image', type: 'image' },
@@ -214,10 +222,10 @@ export default function ManageConfig() {
 
   return (
     <>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', position: 'sticky', top: 0, zIndex: 50, background: 'var(--admin-bg, #f8f9fa)', padding: '1rem 0', borderBottom: '1px solid var(--color-gray-200)' }}>
+      <div className="admin-page-header">
         <div>
-          <h1 style={{ margin: 0 }}>Site Settings</h1>
-          <p style={{ margin: '0.25rem 0 0' }}>Configure every aspect of the site — text, images, visibility.</p>
+          <h1>Site Settings</h1>
+          <p>Configure every aspect of the site — text, images, visibility.</p>
         </div>
         <button className="btn btn--primary" onClick={handleSave} disabled={saving}>
           {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}

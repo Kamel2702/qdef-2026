@@ -211,7 +211,7 @@ export default function ManageDesign() {
 
   return (
     <>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+      <div className="admin-page-header">
         <div>
           <h1>Design</h1>
           <p>Customize colors, fonts, and layout — changes preview live.</p>
