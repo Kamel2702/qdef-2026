@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useConfig } from '../context/ConfigContext';
 
 function hexToRgba(hex, alpha) {
   if (!hex || !hex.startsWith('#') || hex.length < 7) return '';
@@ -9,14 +10,14 @@ function hexToRgba(hex, alpha) {
 }
 
 export default function DesignProvider() {
+  const config = useConfig();
+
   useEffect(() => {
+    if (!config || Object.keys(config).length === 0) return;
+
     let styleEl = null;
     let fontLinkEl = null;
-
-    fetch('/api/config')
-      .then(r => r.ok ? r.json() : {})
-      .then(config => {
-        const root = document.documentElement;
+    const root = document.documentElement;
 
         // Colors
         if (config.design_color_accent) {
@@ -119,14 +120,12 @@ export default function DesignProvider() {
           styleEl.textContent = config.design_custom_css;
           document.head.appendChild(styleEl);
         }
-      })
-      .catch(() => {});
 
     return () => {
       if (styleEl) styleEl.remove();
       if (fontLinkEl) fontLinkEl.remove();
     };
-  }, []);
+  }, [config]);
 
   return null;
 }

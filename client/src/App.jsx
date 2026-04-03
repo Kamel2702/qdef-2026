@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AuthProvider } from './context/AuthContext';
+import { ConfigProvider } from './context/ConfigContext';
 import Layout from './components/Layout';
 import AdminLayout from './components/AdminLayout';
 import DesignProvider from './components/DesignProvider';
@@ -45,6 +46,7 @@ import AgendaPage from './pages/AgendaPage';
 export default function App() {
   return (
     <AuthProvider>
+      <ConfigProvider>
       <ScrollToTop />
       <DesignProvider />
       <Routes>
@@ -86,6 +88,7 @@ export default function App() {
           <Route path="help" element={<ManageHelp />} />
         </Route>
       </Routes>
+    </ConfigProvider>
     </AuthProvider>
   );
 }

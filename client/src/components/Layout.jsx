@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, NavLink, useLocation } from 'react-router-dom';
+import { useConfig } from '../context/ConfigContext';
+import TicketLink from './TicketLink';
 
 export default function Layout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [config, setConfig] = useState({});
+  const config = useConfig();
   const location = useLocation();
 
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
@@ -23,7 +25,6 @@ export default function Layout() {
   const [customPages, setCustomPages] = useState([]);
 
   useEffect(() => {
-    fetch('/api/config').then(r => r.ok ? r.json() : {}).then(setConfig).catch(() => {});
     fetch('/api/custom-pages/nav').then(r => r.ok ? r.json() : []).then(setCustomPages).catch(() => {});
   }, []);
 
@@ -77,21 +78,12 @@ export default function Layout() {
               </NavLink>
             ))}
             {pageOn('page_register_visible') && (
-              config.ticket_url ? (
-                <a href={config.ticket_url} target="_blank" rel="noopener noreferrer" className="header__cta">
-                  Get Tickets
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
-                  </svg>
-                </a>
-              ) : (
-                <Link to="/register" className="header__cta">
-                  Get Tickets
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
-                  </svg>
-                </Link>
-              )
+              <TicketLink className="header__cta">
+                Get Tickets
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+                </svg>
+              </TicketLink>
             )}
           </nav>
 
@@ -152,10 +144,7 @@ export default function Layout() {
               <div className="footer__links">
                 <Link to="/privacy">Privacy Policy</Link>
                 <Link to="/contact">Contact Us</Link>
-                {config.ticket_url
-                  ? <a href={config.ticket_url} target="_blank" rel="noopener noreferrer">Register</a>
-                  : <Link to="/register">Register</Link>
-                }
+                <TicketLink>Register</TicketLink>
               </div>
             </div>
             <div>

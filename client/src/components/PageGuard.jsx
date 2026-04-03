@@ -1,22 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useConfig } from '../context/ConfigContext';
 import ComingSoonPage from '../pages/ComingSoonPage';
 
 export default function PageGuard({ configKey, children }) {
-  const [visible, setVisible] = useState(true);
-  const [loaded, setLoaded] = useState(false);
+  const config = useConfig();
+  const val = config[configKey];
+  const visible = val !== false && val !== 'false';
 
-  useEffect(() => {
-    fetch('/api/config')
-      .then(r => r.ok ? r.json() : {})
-      .then(config => {
-        const val = config[configKey];
-        setVisible(val !== false && val !== 'false');
-      })
-      .catch(() => {})
-      .finally(() => setLoaded(true));
-  }, [configKey]);
-
-  if (!loaded) return null;
   if (!visible) return <ComingSoonPage />;
   return children;
 }

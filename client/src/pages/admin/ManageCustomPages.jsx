@@ -2,8 +2,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import ImageUpload from '../../components/ImageUpload';
 
-const emptyBlock = { type: 'text', heading: '', body: '' };
-
 const emptyPage = {
   title: '',
   slug: '',

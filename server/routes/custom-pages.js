@@ -7,13 +7,12 @@ const router = express.Router();
 // GET /api/custom-pages - list all (public: published only, admin: all)
 router.get('/', async (req, res) => {
   try {
-    const isAdmin = req.headers.authorization;
     let query = supabase
       .from('custom_pages')
       .select('*')
       .order('nav_order', { ascending: true });
 
-    if (!isAdmin) {
+    if (!req.headers.authorization) {
       query = query.eq('published', true);
     }
 

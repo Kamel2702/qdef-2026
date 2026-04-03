@@ -1,5 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useConfig } from '../context/ConfigContext';
 
 const PHOTOS = [
   'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=face',
@@ -120,13 +121,19 @@ export default function HomePage() {
   const [sessions, setSessions] = useState([]);
   const [speakers, setSpeakers] = useState([]);
   const [exhibitions, setExhibitions] = useState([]);
-  const [config, setConfig] = useState({});
+  const config = useConfig();
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [vis, setVis] = useState({});
   const refs = useRef({});
 
+  const particleStyles = useMemo(() => Array.from({ length: 12 }).map((_, i) => ({
+    '--x': `${20 + Math.random() * 60}%`,
+    '--y': `${15 + Math.random() * 70}%`,
+    '--delay': `${i * 0.4}s`,
+    '--size': `${4 + Math.random() * 8}px`,
+  })), []);
+
   useEffect(() => {
-    fetch('/api/config').then(r => r.ok ? r.json() : {}).then(setConfig).catch(() => {});
     fetch('/api/sessions').then(r => r.ok ? r.json() : []).then(d => {
       const l = (Array.isArray(d) ? d : []).sort((a,b) => new Date(a.start_time) - new Date(b.start_time));
       setSessions(l.filter(s => s.type !== 'break').slice(0, 6));
@@ -228,11 +235,8 @@ export default function HomePage() {
               <div className="hero-ring hero-ring--1" />
               <div className="hero-ring hero-ring--2" />
               <div className="hero-ring hero-ring--3" />
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="hero-particle" style={{
-                  '--x': `${20 + Math.random() * 60}%`, '--y': `${15 + Math.random() * 70}%`,
-                  '--delay': `${i * 0.4}s`, '--size': `${4 + Math.random() * 8}px`,
-                }} />
+              {particleStyles.map((style, i) => (
+                <div key={i} className="hero-particle" style={style} />
               ))}
               <div className="hero-visual__core" />
               <div className="hero-visual__label">{g(config, 'hero_logo_text', 'Q-DEF')}<br /><span>{g(config, 'hero_logo_year', '2026')}</span></div>

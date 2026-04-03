@@ -7,13 +7,13 @@ const router = express.Router();
 // GET /api/gallery - list all photos (public: published, admin: all)
 router.get('/', async (req, res) => {
   try {
-    const isAdmin = req.headers.authorization;
     let query = supabase
       .from('gallery')
       .select('*')
       .order('sort_order', { ascending: true });
 
-    if (!isAdmin) {
+    // Only show published photos to non-admin requests
+    if (!req.headers.authorization) {
       query = query.eq('published', true);
     }
 
