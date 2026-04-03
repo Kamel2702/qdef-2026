@@ -35,6 +35,8 @@ const PAGE_VISIBILITY = [
   { key: 'page_venue_visible', label: 'Venue' },
   { key: 'page_register_visible', label: 'Register' },
   { key: 'page_contact_visible', label: 'Contact' },
+  { key: 'page_agenda_visible', label: 'Agenda' },
+  { key: 'page_gallery_visible', label: 'Gallery' },
 ];
 
 const SECTION_VISIBILITY = [

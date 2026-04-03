@@ -32,6 +32,7 @@ const uploadsRoutes = require('./routes/uploads');
 const statsRoutes = require('./routes/stats');
 const adminsRoutes = require('./routes/admins');
 const customPagesRoutes = require('./routes/custom-pages');
+const galleryRoutes = require('./routes/gallery');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/sessions', programmeRoutes);
@@ -49,6 +50,7 @@ app.use('/api/uploads', uploadsRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/admins', adminsRoutes);
 app.use('/api/custom-pages', customPagesRoutes);
+app.use('/api/gallery', galleryRoutes);
 
 // Serve static files from the client build (production)
 const clientDistPath = path.join(__dirname, '..', 'client', 'dist');

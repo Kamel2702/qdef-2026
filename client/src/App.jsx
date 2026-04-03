@@ -37,7 +37,10 @@ import ManageAdmins from './pages/admin/ManageAdmins';
 import ManageDesign from './pages/admin/ManageDesign';
 import ManageHelp from './pages/admin/ManageHelp';
 import ManageCustomPages from './pages/admin/ManageCustomPages';
+import ManageGallery from './pages/admin/ManageGallery';
 import CustomPage from './pages/CustomPage';
+import GalleryPage from './pages/GalleryPage';
+import AgendaPage from './pages/AgendaPage';
 
 export default function App() {
   return (
@@ -55,6 +58,8 @@ export default function App() {
           <Route path="/register" element={<PageGuard configKey="page_register_visible"><RegistrationPage /></PageGuard>} />
           <Route path="/contact" element={<PageGuard configKey="page_contact_visible"><ContactPage /></PageGuard>} />
           <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/gallery" element={<PageGuard configKey="page_gallery_visible"><GalleryPage /></PageGuard>} />
+          <Route path="/agenda" element={<PageGuard configKey="page_agenda_visible"><AgendaPage /></PageGuard>} />
           <Route path="/p/:slug" element={<CustomPage />} />
         </Route>
 
@@ -77,6 +82,7 @@ export default function App() {
           <Route path="design" element={<ManageDesign />} />
           <Route path="settings" element={<ManageConfig />} />
           <Route path="custom-pages" element={<ManageCustomPages />} />
+          <Route path="gallery" element={<ManageGallery />} />
           <Route path="help" element={<ManageHelp />} />
         </Route>
       </Routes>

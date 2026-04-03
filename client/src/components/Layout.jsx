@@ -37,6 +37,8 @@ export default function Layout() {
     { to: '/about', label: 'About', configKey: 'page_about_visible' },
     { to: '/venue', label: 'Venue', configKey: 'page_venue_visible' },
     { to: '/contact', label: 'Contact', configKey: 'page_contact_visible' },
+    { to: '/agenda', label: 'Agenda', configKey: 'page_agenda_visible' },
+    { to: '/gallery', label: 'Gallery', configKey: 'page_gallery_visible' },
   ];
 
   const baseLinks = allNavLinks.filter(link => !link.configKey || pageOn(link.configKey));

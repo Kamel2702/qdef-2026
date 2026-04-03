@@ -7,7 +7,7 @@ module.exports = function seedDatabase(db) {
   if (!db) db = require('./db');
 
   // 1. Admin
-  const passwordHash = bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'admin123', 10);
+  const passwordHash = bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'admin123#', 10);
   db.prepare('INSERT OR REPLACE INTO admins (email, password_hash, name) VALUES (?, ?, ?)').run(
     process.env.ADMIN_EMAIL || 'admin@qdef.lu', passwordHash, 'Q-DEF Admin'
   );

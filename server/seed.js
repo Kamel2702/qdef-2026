@@ -10,14 +10,14 @@ function seed() {
   // 1. Admin user
   // ------------------------------------------------------------------
   console.log('Creating admin user...');
-  const passwordHash = bcrypt.hashSync('admin123', 10);
+  const passwordHash = bcrypt.hashSync('admin123#', 10);
 
   const insertAdmin = db.prepare(`
     INSERT OR REPLACE INTO admins (email, password_hash, name)
     VALUES (?, ?, ?)
   `);
   insertAdmin.run('admin@qdef.lu', passwordHash, 'Q-DEF Admin');
-  console.log('  Admin created: admin@qdef.lu / admin123\n');
+  console.log('  Admin created: admin@qdef.lu / admin123#\n');
 
   // ------------------------------------------------------------------
   // 2. Speakers (15+ diverse speakers)

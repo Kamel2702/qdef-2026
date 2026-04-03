@@ -10,7 +10,7 @@ async function seed() {
   console.log('Seeding Supabase...\n');
 
   // 1. Admin
-  const hash = bcrypt.hashSync('admin123', 10);
+  const hash = bcrypt.hashSync('admin123#', 10);
   const { error: e1 } = await sb.from('admins').upsert(
     { email: 'admin@qdef.lu', password_hash: hash, name: 'Q-DEF Admin' },
     { onConflict: 'email' }
