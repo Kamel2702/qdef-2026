@@ -2,27 +2,16 @@ const express = require('express');
 const multer = require('multer');
 const crypto = require('crypto');
 const path = require('path');
-const fs = require('fs');
+const supabase = require('../supabase');
 const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
-const UPLOADS_DIR = process.env.NETLIFY ? '/tmp/uploads' : path.join(__dirname, '..', 'uploads');
-try { if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true }); } catch {};
-
 const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
 const ALLOWED_MIMETYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, crypto.randomBytes(16).toString('hex') + ext);
-  }
-});
-
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
@@ -33,12 +22,32 @@ const upload = multer({
   }
 });
 
-// POST /api/uploads - upload an image (admin)
-router.post('/', authMiddleware, upload.single('file'), (req, res) => {
+// POST /api/uploads - upload an image to Supabase Storage (admin)
+router.post('/', authMiddleware, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
-    const url = '/uploads/' + req.file.filename;
-    res.json({ url, filename: req.file.filename });
+
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const filename = crypto.randomBytes(16).toString('hex') + ext;
+    const filePath = `images/${filename}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('uploads')
+      .upload(filePath, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error('Supabase storage upload error:', uploadError);
+      return res.status(500).json({ error: 'Upload failed: ' + uploadError.message });
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('uploads')
+      .getPublicUrl(filePath);
+
+    res.json({ url: urlData.publicUrl, filename });
   } catch (err) {
     console.error('Upload error:', err);
     res.status(500).json({ error: 'Internal server error.' });
