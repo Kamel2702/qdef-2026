@@ -99,29 +99,31 @@ export default function ManageGallery() {
             Aucune photo. Cliquez sur "+ Ajouter une photo".
           </div>
         ) : (
-          <div style={{ padding: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+          <div style={{ padding: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>
             {photos.map(photo => (
               <div key={photo.id} style={{
-                borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)',
-                background: 'rgba(255,255,255,0.03)', opacity: photo.published ? 1 : 0.5,
+                borderRadius: '10px', overflow: 'hidden', border: '1px solid #e2e8f0',
+                background: '#ffffff', opacity: photo.published ? 1 : 0.5,
               }}>
-                <div style={{ height: 150, overflow: 'hidden' }}>
+                <div style={{ height: 160, overflow: 'hidden' }}>
                   <img src={photo.image_url} alt={photo.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ padding: '0.75rem' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#e2e8f0', marginBottom: '0.25rem' }}>{photo.caption || '(sans legende)'}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{
-                      fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px',
-                      background: 'rgba(20,184,166,0.15)', color: '#14b8a6',
-                    }}>{photo.category}</span>
-                    <div className="table-actions">
-                      <button onClick={() => togglePublished(photo)} style={{ fontSize: '0.7rem' }}>
-                        {photo.published ? 'Masquer' : 'Publier'}
-                      </button>
-                      <button onClick={() => openEdit(photo)} style={{ fontSize: '0.7rem' }}>Edit</button>
-                      <button className="delete" onClick={() => handleDelete(photo.id)} style={{ fontSize: '0.7rem' }}>X</button>
-                    </div>
+                  <div style={{ fontSize: '0.85rem', color: '#1e293b', fontWeight: 500, marginBottom: '0.35rem' }}>{photo.caption || '(sans legende)'}</div>
+                  <span style={{
+                    fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px',
+                    background: 'rgba(20,184,166,0.1)', color: '#14b8a6', fontWeight: 600,
+                  }}>{photo.category}</span>
+                  <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.6rem', flexWrap: 'wrap' }}>
+                    <button onClick={() => togglePublished(photo)} className="btn btn--ghost" style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}>
+                      {photo.published ? 'Masquer' : 'Publier'}
+                    </button>
+                    <button onClick={() => openEdit(photo)} className="btn btn--ghost" style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}>
+                      Edit
+                    </button>
+                    <button onClick={() => handleDelete(photo.id)} className="btn btn--ghost" style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', color: '#ef4444', borderColor: '#fecaca' }}>
+                      Supprimer
+                    </button>
                   </div>
                 </div>
               </div>
