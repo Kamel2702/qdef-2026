@@ -20,8 +20,11 @@ export default function Layout() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const [customPages, setCustomPages] = useState([]);
+
   useEffect(() => {
     fetch('/api/config').then(r => r.ok ? r.json() : {}).then(setConfig).catch(() => {});
+    fetch('/api/custom-pages/nav').then(r => r.ok ? r.json() : []).then(setCustomPages).catch(() => {});
   }, []);
 
   const g = (key, fallback) => config[key] || fallback;
@@ -36,7 +39,14 @@ export default function Layout() {
     { to: '/contact', label: 'Contact', configKey: 'page_contact_visible' },
   ];
 
-  const navLinks = allNavLinks.filter(link => !link.configKey || pageOn(link.configKey));
+  const baseLinks = allNavLinks.filter(link => !link.configKey || pageOn(link.configKey));
+
+  const customNavLinks = customPages.map(p => ({
+    to: `/p/${p.slug}`,
+    label: p.title,
+  }));
+
+  const navLinks = [...baseLinks, ...customNavLinks];
 
   return (
     <>

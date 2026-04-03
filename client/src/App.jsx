@@ -36,6 +36,8 @@ import ManageConfig from './pages/admin/ManageConfig';
 import ManageAdmins from './pages/admin/ManageAdmins';
 import ManageDesign from './pages/admin/ManageDesign';
 import ManageHelp from './pages/admin/ManageHelp';
+import ManageCustomPages from './pages/admin/ManageCustomPages';
+import CustomPage from './pages/CustomPage';
 
 export default function App() {
   return (
@@ -53,6 +55,7 @@ export default function App() {
           <Route path="/register" element={<PageGuard configKey="page_register_visible"><RegistrationPage /></PageGuard>} />
           <Route path="/contact" element={<PageGuard configKey="page_contact_visible"><ContactPage /></PageGuard>} />
           <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/p/:slug" element={<CustomPage />} />
         </Route>
 
         {/* Admin login - standalone, no layout */}
@@ -73,6 +76,7 @@ export default function App() {
           <Route path="admins" element={<ManageAdmins />} />
           <Route path="design" element={<ManageDesign />} />
           <Route path="settings" element={<ManageConfig />} />
+          <Route path="custom-pages" element={<ManageCustomPages />} />
           <Route path="help" element={<ManageHelp />} />
         </Route>
       </Routes>
