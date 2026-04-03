@@ -60,6 +60,7 @@ const SECTION_CONFIG = [
   },
   {
     label: 'Hero Section',
+    visibilityKey: 'section_hero_visible',
     fields: [
       { key: 'hero_bg_image', label: 'Background Image', type: 'image' },
       { key: 'hero_date_badge', label: 'Date Badge', type: 'text', placeholder: 'Nov 25, 2026' },
@@ -73,6 +74,7 @@ const SECTION_CONFIG = [
   },
   {
     label: 'Stats Bar',
+    visibilityKey: 'section_stats_visible',
     fields: [
       { key: 'stats_attendees', label: 'Attendees', type: 'text', placeholder: '300+' },
       { key: 'stats_speakers', label: 'Speakers', type: 'text', placeholder: '17' },
@@ -83,6 +85,7 @@ const SECTION_CONFIG = [
   },
   {
     label: 'About & Speakers',
+    visibilityKey: 'section_about_visible',
     fields: [
       { key: 'section_about_label', label: 'Label', type: 'text', placeholder: 'About the summit' },
       { key: 'section_about_title', label: 'Title (supports <br>)', type: 'text', placeholder: 'Where quantum meets security.' },
@@ -94,6 +97,7 @@ const SECTION_CONFIG = [
   },
   {
     label: 'Exhibition Stands',
+    visibilityKey: 'section_exhibitions_visible',
     fields: [
       { key: 'section_exhibitions_label', label: 'Label', type: 'text', placeholder: 'Exhibition Hall' },
       { key: 'section_exhibitions_title', label: 'Title', type: 'text', placeholder: '12 stands to explore.' },
@@ -102,6 +106,7 @@ const SECTION_CONFIG = [
   },
   {
     label: 'Programme Preview',
+    visibilityKey: 'section_programme_visible',
     fields: [
       { key: 'section_programme_label', label: 'Label', type: 'text', placeholder: 'Programme' },
       { key: 'section_programme_title', label: 'Title', type: 'text', placeholder: 'Full-day schedule.' },
@@ -110,6 +115,7 @@ const SECTION_CONFIG = [
   },
   {
     label: 'CTA Banner',
+    visibilityKey: 'section_cta_visible',
     fields: [
       { key: 'section_cta_title', label: 'Title', type: 'text', placeholder: 'Limited seats available.' },
       { key: 'section_cta_subtitle', label: 'Subtitle', type: 'text', placeholder: 'Join us November 25, 2026 at Maison du Savoir.' },
@@ -118,6 +124,7 @@ const SECTION_CONFIG = [
   },
   {
     label: 'Key Themes — Card 1',
+    visibilityKey: 'section_themes_visible',
     fields: [
       { key: 'section_themes_label', label: 'Section Label', type: 'text', placeholder: 'Key themes' },
       { key: 'section_themes_title', label: 'Section Title (supports <br>)', type: 'text', placeholder: 'Three pillars of quantum defense.' },
@@ -144,6 +151,7 @@ const SECTION_CONFIG = [
   },
   {
     label: 'Final CTA',
+    visibilityKey: 'section_final_cta_visible',
     fields: [
       { key: 'final_cta_bg_image', label: 'Background Image', type: 'image' },
       { key: 'section_final_cta_title', label: 'Title', type: 'text', placeholder: 'Secure your place.' },
@@ -153,6 +161,7 @@ const SECTION_CONFIG = [
   },
   {
     label: 'Partners',
+    visibilityKey: 'section_partners_visible',
     fields: [
       { key: 'section_partners_label', label: 'Label', type: 'text', placeholder: 'Partners' },
       { key: 'section_partners_title', label: 'Title', type: 'text', placeholder: 'Trusted by leaders.' },
@@ -365,9 +374,30 @@ export default function ManageConfig() {
 
       {/* Section Configuration */}
       {SECTION_CONFIG.map(group => (
-        <div className="admin-table-wrapper" key={group.label} style={{ marginBottom: '1.5rem' }}>
-          <div className="admin-table-header">
-            <h2>{group.label}</h2>
+        <div className="admin-table-wrapper" key={group.label} style={{ marginBottom: '1.5rem', opacity: group.visibilityKey && !isOn(group.visibilityKey) ? 0.5 : 1, transition: 'opacity 0.2s' }}>
+          <div className="admin-table-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h2 style={{ margin: 0 }}>{group.label}</h2>
+            {group.visibilityKey && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.75rem', color: isOn(group.visibilityKey) ? '#10b981' : '#ef4444', fontWeight: 600 }}>
+                  {isOn(group.visibilityKey) ? 'Visible' : 'Masque'}
+                </span>
+                <div
+                  onClick={() => handleToggle(group.visibilityKey)}
+                  style={{
+                    width: 40, height: 22, borderRadius: 11, cursor: 'pointer',
+                    background: isOn(group.visibilityKey) ? '#10b981' : 'rgba(255,255,255,0.15)',
+                    position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+                  }}
+                >
+                  <div style={{
+                    width: 18, height: 18, borderRadius: '50%', background: 'white',
+                    position: 'absolute', top: 2, left: isOn(group.visibilityKey) ? 20 : 2,
+                    transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                  }} />
+                </div>
+              </div>
+            )}
           </div>
           <div style={{ padding: '1.5rem' }}>
             <div className="form-grid">
