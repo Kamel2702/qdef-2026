@@ -1,4 +1,10 @@
+import { useConfig } from '../context/ConfigContext';
+
 export default function VenuePage() {
+  const config = useConfig();
+  const venueName = config.event_location || 'Maison du Savoir';
+  const venueAddress = config.event_address || '2, avenue de l\'Université, 4365 Esch-sur-Alzette, Grand Duchy of Luxembourg';
+
   return (
     <>
       <section className="page-hero page-hero--img" style={{
@@ -9,7 +15,7 @@ export default function VenuePage() {
           <h1 className="page-hero__title">
             <span className="gradient-text">Venue</span>
           </h1>
-          <p className="page-hero__subtitle">Maison du Savoir &mdash; Esch-sur-Alzette, Luxembourg</p>
+          <p className="page-hero__subtitle">{venueName}</p>
         </div>
       </section>
 
@@ -32,22 +38,15 @@ export default function VenuePage() {
             <div className="about-preview__text">
               <h2>About the <span className="gradient-text">Venue</span></h2>
               <p style={{ color: 'var(--color-gray-500)', lineHeight: 1.8, marginBottom: '1rem' }}>
-                The Maison du Savoir is part of the University of Luxembourg&apos;s Belval campus
-                in Esch-sur-Alzette. This modern, state-of-the-art building offers world-class
-                conference facilities in the heart of Luxembourg&apos;s innovation district.
+                {config.venue_description_1 || `The ${venueName} is part of the University of Luxembourg's Belval campus in Esch-sur-Alzette. This modern, state-of-the-art building offers world-class conference facilities in the heart of Luxembourg's innovation district.`}
               </p>
               <p style={{ color: 'var(--color-gray-500)', lineHeight: 1.8 }}>
-                Built on the site of former steelworks, Belval represents Luxembourg&apos;s
-                transformation from industrial heritage to a hub of research, technology,
-                and innovation — the perfect setting for Q-DEF&apos;s quantum cyberdefense summit.
+                {config.venue_description_2 || `Built on the site of former steelworks, Belval represents Luxembourg's transformation from industrial heritage to a hub of research, technology, and innovation — the perfect setting for Q-DEF's quantum cyberdefense summit.`}
               </p>
               <div className="glass-card" style={{ marginTop: '1.5rem', padding: '1.25rem' }}>
                 <strong style={{ color: 'var(--color-cyan)' }}>Address:</strong><br />
                 <span style={{ color: 'var(--color-gray-500)' }}>
-                  Maison du Savoir<br />
-                  2, avenue de l&apos;Universit&eacute;<br />
-                  4365 Esch-sur-Alzette<br />
-                  Grand Duchy of Luxembourg
+                  {venueAddress.split(',').map((part, i) => <span key={i}>{part.trim()}{i < venueAddress.split(',').length - 1 && <br />}</span>)}
                 </span>
               </div>
             </div>

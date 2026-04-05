@@ -42,6 +42,7 @@ import ManageGallery from './pages/admin/ManageGallery';
 import CustomPage from './pages/CustomPage';
 import GalleryPage from './pages/GalleryPage';
 import AgendaPage from './pages/AgendaPage';
+import NewsPage from './pages/NewsPage';
 
 export default function App() {
   return (
@@ -62,6 +63,7 @@ export default function App() {
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/gallery" element={<PageGuard configKey="page_gallery_visible"><GalleryPage /></PageGuard>} />
           <Route path="/agenda" element={<PageGuard configKey="page_agenda_visible"><AgendaPage /></PageGuard>} />
+          <Route path="/news" element={<PageGuard configKey="page_news_visible"><NewsPage /></PageGuard>} />
           <Route path="/p/:slug" element={<CustomPage />} />
         </Route>
 

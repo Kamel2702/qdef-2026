@@ -37,6 +37,7 @@ const PAGE_VISIBILITY = [
   { key: 'page_contact_visible', label: 'Contact' },
   { key: 'page_agenda_visible', label: 'Agenda' },
   { key: 'page_gallery_visible', label: 'Gallery' },
+  { key: 'page_news_visible', label: 'News' },
 ];
 
 const SECTION_VISIBILITY = [
@@ -47,6 +48,8 @@ const SECTION_VISIBILITY = [
   { key: 'section_programme_visible', label: 'Programme Preview' },
   { key: 'section_cta_visible', label: 'CTA Banner' },
   { key: 'section_themes_visible', label: 'Key Themes' },
+  { key: 'section_sponsors_visible', label: 'Sponsors' },
+  { key: 'section_news_visible', label: 'Latest News' },
   { key: 'section_final_cta_visible', label: 'Final CTA' },
   { key: 'section_partners_visible', label: 'Partners' },
 ];
@@ -149,6 +152,22 @@ const SECTION_CONFIG = [
       { key: 'theme3_image', label: 'Image', type: 'image' },
       { key: 'theme3_title', label: 'Title', type: 'text', placeholder: 'Post-Quantum Cryptography' },
       { key: 'theme3_desc', label: 'Description', type: 'text', placeholder: 'Deploying quantum-safe algorithms...' },
+    ],
+  },
+  {
+    label: 'Sponsors Section',
+    visibilityKey: 'section_sponsors_visible',
+    fields: [
+      { key: 'section_sponsors_label', label: 'Label', type: 'text', placeholder: 'Sponsors & Partners' },
+      { key: 'section_sponsors_title', label: 'Title', type: 'text', placeholder: 'They make it possible.' },
+    ],
+  },
+  {
+    label: 'News Section',
+    visibilityKey: 'section_news_visible',
+    fields: [
+      { key: 'section_news_label', label: 'Label', type: 'text', placeholder: 'Latest News' },
+      { key: 'section_news_title', label: 'Title', type: 'text', placeholder: 'Stay informed.' },
     ],
   },
   {

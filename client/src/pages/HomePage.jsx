@@ -121,6 +121,8 @@ export default function HomePage() {
   const [sessions, setSessions] = useState([]);
   const [speakers, setSpeakers] = useState([]);
   const [exhibitions, setExhibitions] = useState([]);
+  const [sponsors, setSponsors] = useState([]);
+  const [news, setNews] = useState([]);
   const config = useConfig();
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [vis, setVis] = useState({});
@@ -140,6 +142,8 @@ export default function HomePage() {
     }).catch(() => {});
     fetch('/api/speakers').then(r => r.ok ? r.json() : []).then(d => setSpeakers((Array.isArray(d) ? d : []).slice(0, 8))).catch(() => {});
     fetch('/api/exhibitions').then(r => r.ok ? r.json() : []).then(d => setExhibitions(Array.isArray(d) ? d : [])).catch(() => {});
+    fetch('/api/sponsors').then(r => r.ok ? r.json() : []).then(d => setSponsors(Array.isArray(d) ? d : [])).catch(() => {});
+    fetch('/api/news').then(r => r.ok ? r.json() : []).then(d => setNews((Array.isArray(d) ? d : []).filter(n => n.published !== false).slice(0, 3))).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -309,18 +313,23 @@ export default function HomePage() {
               <p className="section-subtitle">{g(config, 'section_exhibitions_subtitle', 'Meet the companies building the future of quantum defense.')}</p>
             </div>
             <div className="stands-grid">
-              {stands.map((stand, i) => (
-                <div className="stand-card" key={stand.id || i} style={{ animationDelay: `${i * 0.06}s` }}>
-                  <div className="stand-card__img-wrap">
-                    <img src={stand.image_url} alt={stand.name} className="stand-card__img" loading="lazy" />
-                    <span className="stand-card__tag">{stand.tag}</span>
+              {stands.map((stand, i) => {
+                const Card = (
+                  <div className="stand-card" key={stand.id || i} style={{ animationDelay: `${i * 0.06}s` }}>
+                    <div className="stand-card__img-wrap">
+                      <img src={stand.image_url} alt={stand.name} className="stand-card__img" loading="lazy" />
+                      <span className="stand-card__tag">{stand.tag}</span>
+                    </div>
+                    <div className="stand-card__body">
+                      <h3 className="stand-card__name">{stand.name}</h3>
+                      <p className="stand-card__desc">{stand.description}</p>
+                    </div>
                   </div>
-                  <div className="stand-card__body">
-                    <h3 className="stand-card__name">{stand.name}</h3>
-                    <p className="stand-card__desc">{stand.description}</p>
-                  </div>
-                </div>
-              ))}
+                );
+                return stand.website_url ? (
+                  <a key={stand.id || i} href={stand.website_url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>{Card}</a>
+                ) : Card;
+              })}
             </div>
           </div>
         </div>
@@ -396,6 +405,80 @@ export default function HomePage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      )}
+
+      {/* ===== SPONSORS ===== */}
+      {(config.section_sponsors_visible === true || config.section_sponsors_visible === 'true') && sponsors.length > 0 && (
+      <section className="section" ref={r('sponsors')} data-s="sponsors">
+        <div className="container">
+          <div className={a('sponsors')}>
+            <div className="section-header">
+              <span className="label-tag">{g(config, 'section_sponsors_label', 'Sponsors & Partners')}</span>
+              <h2>{g(config, 'section_sponsors_title', 'They make it possible.')}</h2>
+            </div>
+            {['organizer', 'platinum', 'gold', 'silver', 'institutional'].map(tier => {
+              const tierSponsors = sponsors.filter(s => (s.tier || '').toLowerCase() === tier);
+              if (tierSponsors.length === 0) return null;
+              return (
+                <div key={tier} className="sponsors-tier" style={{ marginBottom: '2rem' }}>
+                  <h3 className="sponsors-tier__label">{tier.charAt(0).toUpperCase() + tier.slice(1)}</h3>
+                  <div className={`sponsors-grid sponsors-grid--${tier}`}>
+                    {tierSponsors.map(s => {
+                      const inner = (
+                        <div className="sponsor-card glass-card" key={s.id}>
+                          {s.logo_url ? (
+                            <img src={s.logo_url} alt={s.name} className="sponsor-card__logo" loading="lazy" />
+                          ) : (
+                            <div className="sponsor-card__name-fallback">{s.name}</div>
+                          )}
+                          <h4 className="sponsor-card__name">{s.name}</h4>
+                          {s.description && <p className="sponsor-card__desc">{s.description}</p>}
+                        </div>
+                      );
+                      return s.website_url ? (
+                        <a key={s.id} href={s.website_url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>{inner}</a>
+                      ) : <div key={s.id}>{inner}</div>;
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+      )}
+
+      {/* ===== NEWS ===== */}
+      {(config.section_news_visible === true || config.section_news_visible === 'true') && news.length > 0 && (
+      <section className="section section-dark" ref={r('news')} data-s="news">
+        <div className="container">
+          <div className={a('news')}>
+            <div className="section-header" style={{ textAlign: 'left' }}>
+              <span className="label-tag">{g(config, 'section_news_label', 'Latest News')}</span>
+              <h2>{g(config, 'section_news_title', 'Stay informed.')}</h2>
+            </div>
+            <div className="news-grid">
+              {news.map((item, i) => (
+                <Link to={`/news`} key={item.id || i} className="news-card glass-card" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  {item.image_url && (
+                    <div className="news-card__img-wrap">
+                      <img src={item.image_url} alt={item.title} className="news-card__img" loading="lazy" />
+                    </div>
+                  )}
+                  <div className="news-card__body">
+                    <h3 className="news-card__title">{item.title}</h3>
+                    {item.excerpt && <p className="news-card__excerpt">{item.excerpt}</p>}
+                    <span className="news-card__date">{item.created_at ? new Date(item.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <div style={{ marginTop: '2rem' }}>
+              <Link to="/news" className="btn btn-outline-glow">View All News &rarr;</Link>
             </div>
           </div>
         </div>

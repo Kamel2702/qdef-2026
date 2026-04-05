@@ -40,6 +40,7 @@ export default function Layout() {
     { to: '/contact', label: 'Contact', configKey: 'page_contact_visible' },
     { to: '/agenda', label: 'Agenda', configKey: 'page_agenda_visible' },
     { to: '/gallery', label: 'Gallery', configKey: 'page_gallery_visible' },
+    { to: '/news', label: 'News', configKey: 'page_news_visible' },
   ];
 
   const baseLinks = allNavLinks.filter(link => !link.configKey || pageOn(link.configKey));

@@ -1,16 +1,36 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useConfig } from '../context/ConfigContext';
 import TicketLink from '../components/TicketLink';
 
 export default function AboutPage() {
+  const config = useConfig();
+  const [page, setPage] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/pages/about')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.content) {
+          try {
+            setPage(typeof data.content === 'string' ? JSON.parse(data.content) : data.content);
+          } catch { setPage(null); }
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const g = (key, fallback) => (page && page[key]) || config[`about_${key}`] || fallback;
+
   return (
     <>
       <section className="page-hero page-hero--img" style={{
-        backgroundImage: 'url(https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1920&q=80)'
+        backgroundImage: `url(${g('hero_image', 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1920&q=80')})`
       }}>
         <div className="page-hero__overlay" />
         <div className="page-hero__content">
-          <h1 className="page-hero__title">About <span className="gradient-text">Q-DEF</span></h1>
-          <p className="page-hero__subtitle">Shaping the future of quantum-safe defense in Europe</p>
+          <h1 className="page-hero__title">About <span className="gradient-text">{config.event_name || 'Q-DEF'}</span></h1>
+          <p className="page-hero__subtitle">{g('subtitle', 'Shaping the future of quantum-safe defense in Europe')}</p>
         </div>
       </section>
 
@@ -19,21 +39,18 @@ export default function AboutPage() {
         <div className="container">
           <div className="about-preview">
             <div className="about-preview__text">
-              <span className="label-tag">Our mission</span>
-              <h2>Defending tomorrow,<br />starting today.</h2>
+              <span className="label-tag">{g('mission_label', 'Our mission')}</span>
+              <h2 dangerouslySetInnerHTML={{ __html: g('mission_title', 'Defending tomorrow,<br />starting today.') }} />
               <p style={{ color: 'var(--color-gray-500)', lineHeight: 1.8 }}>
-                Q-DEF Conference Luxembourg advances the understanding and preparedness
-                of European defense communities in the face of quantum and emerging technologies.
-                We bring together decision-makers, researchers, and industry innovators.
+                {g('mission', 'Q-DEF Conference Luxembourg advances the understanding and preparedness of European defense communities in the face of quantum and emerging technologies. We bring together decision-makers, researchers, and industry innovators.')}
               </p>
               <p style={{ color: 'var(--color-gray-500)', lineHeight: 1.8 }}>
-                Our 2026 edition focuses on the critical juncture where quantum computing
-                meets national security — exploring both the threats and the transformative potential.
+                {g('mission_2', 'Our 2026 edition focuses on the critical juncture where quantum computing meets national security — exploring both the threats and the transformative potential.')}
               </p>
               <TicketLink className="btn btn-gradient" style={{ marginTop: '1rem' }}>Attend the Event</TicketLink>
             </div>
             <div className="about-preview__image">
-              <img src="https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&q=80" alt="Q-DEF Conference" loading="lazy" />
+              <img src={g('mission_image', 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&q=80')} alt="Q-DEF Conference" loading="lazy" />
             </div>
           </div>
         </div>
